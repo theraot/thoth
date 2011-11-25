@@ -623,29 +623,23 @@
 		{
 			var result = function(a, b)
 			{
-				if (typeof a === 'string' && typeof b === 'undefined')
+				var unique = false;
+				if (typeof a === 'string')
 				{
-					if (loaded_modules.containsKey(a))
+					a = [a];
+					unique = true;
+				}
+				if (thoth.isArray(a) && (typeof b === 'function' || typeof b === 'undefined'))
+				{
+					var result = _require(a, b);
+					if (unique)
 					{
-						var loaded_module = loaded_modules.get(a);
-						if (loaded_module.cache)
-						{
-							return loaded_modules.get(a).devil;
-						}
-						else
-						{
-							return loaded_modules.get(a).devil();
-						}
+						return result[a[0]];
 					}
 					else
 					{
-						throw 'The module "' + a + '" is not ready.';
-						return null;
+						return result;
 					}
-				}
-				else if (thoth.isArray(a) && typeof b === 'function')
-				{
-					thoth.require(a, b);
 				}
 				else
 				{
@@ -687,7 +681,7 @@
 		
 		//--------------------------------------------------------------
 		
-		function checkDependencies(current_module, dependencies)
+		function processDependencies(current_module, dependencies)
 		{
 			var pending_dependencies = [];
 			var processed_dependencies = [];
@@ -703,7 +697,7 @@
 						var loaded_module = loaded_modules.get(_current);
 						current_module.fillParameter(_current, loaded_module.devil, loaded_module.cache);
 					}
-					else
+					else if (current_module.notify)
 					{
 						thoth.put (pending_dependencies, _current);
 						event_hub.add (
@@ -806,7 +800,8 @@
 						thoth.delay(current_module.load, 0, false);
 					}
 				};
-				checkDependencies(current_module, dependencies);
+				current_module.notify = true;
+				processDependencies(current_module, dependencies);
 				if (current_module.pending_dependencies.length > 0)
 				{
 					if (current_module.name === '' )
@@ -936,10 +931,10 @@
 			{
 				devil = current_module.readParameter('exports');
 			}
-			if (thoth.config.autoGatherModuleNames && !current_module.required && current_module.name === '')
+			if (current_module.name === '')
 			{
 				thoth.remove(anonymous_modules, current_module);
-				if (typeof devil !== 'undefined' && typeof devil.name === 'string')
+				if (thoth.config.autoGatherModuleNames && !current_module.required && typeof devil !== 'undefined' && typeof devil.name === 'string')
 				{
 					current_module.name = devil.name;
 					current_module.fullname = current_module.path !== '' ? current_module.path + '/' + current_module.name : current_module.name;
@@ -1173,13 +1168,37 @@
 			}
 		}
 		
+		function _require(dependencies, factory)
+		{
+			if (typeof factory !== 'function')
+			{
+				factory = function(){};
+			}
+			var current_module = _buildModule('', dependencies, factory);
+			var result = [];
+			var fakeModule =
+			{
+				path : current_module.path,
+				notify : false,
+				fillParameter : function(name, value, cache)
+				{
+					if (cache)
+					{
+						result[name] = value;
+					}
+				}
+			};
+			processDependencies(fakeModule, dependencies);
+			current_module.required = true;
+			current_module.load();
+			return result;
+		}
+		
 		//--------------------------------------------------------------
 		
 		thoth.require = function(dependencies, factory)
 		{
-			var current_module = _buildModule('', dependencies, factory);
-			current_module.required = true;
-			current_module.load();
+			return _require(dependencies, factory);
 		};
 		
 		thoth.include = function(url, callback)
