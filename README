@@ -1,0 +1,3 @@
+thoth
+
+This is a JavaScript module loader, it has a partial implementation of the Asynchronous Module Definition (https://github.com/amdjs/amdjs-api/wiki) with a different way of doing things. It can be a light alternative for to more complex module loaders while exposing some extra functionality that may in handy.
