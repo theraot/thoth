@@ -1,5 +1,9 @@
 thoth
 
-This is a JavaScript module loader, it has a partial implementation of the Asynchronous Module Definition (https://github.com/amdjs/amdjs-api/wiki) with a different way of doing things. It can be a light alternative for to more complex module loaders while exposing some extra functionality that may in handy.
+This is a JavaScript module loader, it has a partial implementation of the Asynchronous Module Definition (https://github.com/amdjs/amdjs-api/wiki) with a different way of doing things. It can be a light alternative for more complex module loaders while exposing some extra functionality that may in handy.
 
 The Asynchronous Module Definition (AMD for brevity) is an specification to write JavaScript modules defining their dependencies and an orderly load scheme. That is, that it will help you make sure your script files are executed in the right order (that if you have dependencies they are already loaded when your code runs).
+
+thoth will not try to guess the files that are needed to find any missing module, instead it offers you the functions "include" and "include once" which will let you load file explicitly, dynamically and asynchronously while giving you a handy callback to execute when the files are loaded. This comes in handy if you need to use javascript libraries from third party that are not AMD modules.
+
+Also thoth will not try to parse the code of your module, which means that it will not "discover" dependencies. Please make your dependencies explicit. 
