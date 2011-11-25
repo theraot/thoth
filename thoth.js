@@ -1247,6 +1247,7 @@
 		thoth.config = {};
 		thoth.config.autoIncludeFiles = false;
 		thoth.config.autoGatherModuleNames = false;
+		thoth.config.autoLoadModules = false;
 		
 		var require = window.require = thoth.require;
 		var include = window.include = thoth.include;
