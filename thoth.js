@@ -511,7 +511,7 @@
 						{
 							id : id,
 							continuations : [continuation],
-							executing : false,
+							executing : false
 						}
 					);
 				}
