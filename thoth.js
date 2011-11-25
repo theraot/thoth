@@ -1250,6 +1250,7 @@
 		
 		var require = window.require = thoth.require;
 		var include = window.include = thoth.include;
+		var include = window.include_once = thoth.include_once;
 		var define = window.define = thoth.define;
 		
 		/* partial implementation of https://github.com/amdjs/amdjs-api/wiki */
@@ -1260,10 +1261,18 @@
 		for (var index = 0; index < metaElements.length; index++)
 		{
 			var meta = metaElements[index];
-			if (meta.getAttribute('name') == 'include-main-script')
+			if (meta.getAttribute('name') == 'thoth-load-script')
 			{
 				include(meta.getAttribute('content'));
 			}
 		}
 	}
 )(window.thoth = (window.thoth || {}), window);
+
+window.toth.define(
+	'thoth',
+	function()
+	{
+		return window.toth;
+	}
+);
