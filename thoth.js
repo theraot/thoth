@@ -1269,10 +1269,10 @@
 	}
 )(window.thoth = (window.thoth || {}), window);
 
-window.toth.define(
+window.thoth.define(
 	'thoth',
 	function()
 	{
-		return window.toth;
+		return window.thoth;
 	}
 );
