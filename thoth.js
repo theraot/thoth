@@ -621,31 +621,7 @@
 		
 		function createInternalRequire(current_module)
 		{
-			var result = function(a, b)
-			{
-				var unique = false;
-				if (typeof a === 'string')
-				{
-					a = [a];
-					unique = true;
-				}
-				if (thoth.isArray(a) && (typeof b === 'function' || typeof b === 'undefined'))
-				{
-					var result = _require(a, b);
-					if (unique)
-					{
-						return result[a[0]];
-					}
-					else
-					{
-						return result;
-					}
-				}
-				else
-				{
-					throw 'Invalid Arguments';
-				}
-			};
+			var result = _require;
 			
 			result.toUrl = function(str)
 			{
@@ -1170,6 +1146,12 @@
 		
 		function _require(dependencies, factory)
 		{
+			var unique = false;
+			if (typeof dependencies === 'string')
+			{
+				dependencies = [dependencies];
+				unique = true;
+			}
 			if (typeof factory !== 'function')
 			{
 				factory = function(){};
@@ -1191,7 +1173,14 @@
 			processDependencies(fakeModule, dependencies);
 			current_module.required = true;
 			current_module.load();
-			return result;
+			if (unique)
+			{
+				return result[dependencies[0]];
+			}
+			else
+			{
+				return result;
+			}
 		}
 		
 		//--------------------------------------------------------------
