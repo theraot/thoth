@@ -1239,7 +1239,10 @@
 		thoth.define = function(id, dependencies, factory)
 		{
 			var current_module = _buildModule(id, dependencies, factory);
-			current_module.load();
+			if (thoth.config.autoLoadModules)
+			{
+				current_module.load();
+			}
 		};
 		
 		//--------------------------------------------------------------
