@@ -145,7 +145,7 @@
 			}
 		};
 		
-		thoth.removeWhere = function(array, predicate) //Not used
+		thoth.removeWhere = function(array, predicate)
 		{
 			var result = 0;
 			var count = array.length;
@@ -298,21 +298,173 @@
 	}
 )(window.thoth = (window.thoth || {}), window);
 
+(	/* Dictionary */
+	function(thoth, window, undefined)
+	{
+		thoth.Dictionary = function()
+		{
+			var dic = {};
+			var length = 0;
+			
+			//----------------------------------------------------------
+			
+			this.contains = function (value) //Not used
+			{
+				for (var key in dic)
+				{
+					if (dic[key] === value)
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			
+			this.containsKey = function (key)
+			{
+				if (key in dic)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			
+			this.containsWhere = function (predicate) //Not used
+			{
+				for (var key in dic)
+				{
+					if (predicate(dic[key]))
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			
+			this.every = function(callback)
+			{
+				for (var key in dic)
+				{
+					if (!callback(dic[key]))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			
+			this.forEach = function(callback)
+			{
+				for (var key in dic)
+				{
+					callback(dic[key]);
+				}
+			}
+			
+			this.get = function (key)
+			{
+				if (key in dic)
+				{
+					return dic[key];
+				}
+				else
+				{
+					return undefined;
+				}
+			}
+			
+			this.length = function()
+			{
+				return length;
+			}
+			
+			this.remove = function (key)
+			{
+				if (key in dic)
+				{
+					var result = dic[key];
+					delete dic[key];
+					length--;
+					return result;
+				}
+				else
+				{
+					return undefined;
+				}
+			}
+			
+			this.removeWhere = function (predicate) //Not Used
+			{
+				var result = 0;
+				for (var key in dic)
+				{
+					if (predicate(dic[key]))
+					{
+						delete dic[key];
+						result++;
+						length--;
+					}
+				}
+				return result;
+			}
+			
+			this.set = function(key, item)
+			{
+				if (!(key in dic))
+				{
+					length++;
+				}
+				dic[key] = item;
+			}
+			
+			this.take = function()
+			{
+				var result;
+				for (var key in dic)
+				{
+					result = dic[key];
+					delete dic[key];
+					length--;
+				}
+				return result;
+			}
+			
+			this.toString = function()
+			{
+				var result = '';
+				var first = true;
+				for (var key in dic)
+				{
+					if (first)
+					{
+						first = false;
+					}
+					else
+					{
+						result += ',';
+					}
+					result += key;
+				}
+				return result;
+			}
+		}
+	}
+)(window.thoth = (window.thoth || {}), window);
+
 (	/* Event */
 	function(thoth, window, undefined)
 	{
 		thoth.Event = function()
 		{
-			var events = [];
+			var events = new thoth.Dictionary();
 			
 			function _execute_event(event)
 			{
-				if (!event.executing)
-				{
-					event.executing = true;
-					_execute_event_continue(event);
-					event.executing = false;
-				}
+				event.executing = true;
+				_execute_event_continue(event);
 			}
 			
 			function _execute_event_continue(event)
@@ -329,43 +481,23 @@
 						count--;
 						index--;
 					}
-					if (event.executing)
-					{
-						event.executed = true;
-					}
+					event.executing = false;
+					events.remove(event.id);
 				}
 			}
 			
 			function _append_event(id, continuation)
 			{
-				var count = events.length;
-				var event;
-				for (var index = 0; index < count; index++)
+				var event = events.get(id);
+				if (typeof event === 'undefined')
 				{
-					event = events[index];
-					if (event.execuded)
-					{
-						events.splice(index, 1);
-						count--;
-						index--;
-					}
-					else
-					{
-						if (event.id === id)
-						{
-							if (typeof event.continuations === 'undefined')
-							{
-								event.continuations = [continuation];
-							}
-							else
-							{
-								thoth.push(event.continuations, continuation);
-							}
-							return true;
-						}
-					}
+					return false;
 				}
-				return false;
+				else
+				{
+					thoth.push(event.continuations, continuation);
+					return true;
+				}
 			};
 			
 			//----------------------------------------------------------
@@ -374,240 +506,54 @@
 			{
 				if (!_append_event(id, continuation))
 				{
-					var event =
-					{
-						id : id,
-						continuations : [continuation],
-						executing : false,
-						executed : false
-					};
-					thoth.push(events, event);
+					events.set (
+						id,
+						{
+							id : id,
+							continuations : [continuation],
+							executing : false,
+						}
+					);
 				}
 				return true;
 			};
 			
 			this.go = function (id)
 			{
-				var count = events.length;
-				var event;
-				for (var index = 0; index < count; index++)
+				var event = events.get(id);
+				if (typeof event === 'undefined')
 				{
-					event = events[index];
-					if (event.execuded)
-					{
-						events.splice(index, 1);
-						count--;
-						index--;
-					}
-					else
-					{
-						if (event.id === id)
-						{
-							return _execute_event(event);
-						}
-					}
+					return false;
 				}
-				return false;
+				else
+				{
+					_execute_event(event);
+					return true;
+				}
 			};
 			
 			this.remove = function (id)
 			{
-				var conteo = events.length;
-				var event;
-				for (var index = 0; index < conteo; index++)
-				{
-					event = events[index];
-					if (event.id === id)
-					{
-						events.splice(index, 1);
-						return true;
-					}
-					else
-					{
-						if (event.execuded)
-						{
-							events.splice(index, 1);
-							count--;
-							index--;
-						}
-					}
-				}
-				return false;
+				return events.remove(id);
 			};
 			
 			this.stop = function (id)
 			{
-				var conteo = events.length;
-				var event;
-				for (var index = 0; index < conteo; index++)
+				var event = events.get(id);
+				if (typeof event === 'undefined')
 				{
-					event = events[index];
-					if (event.id === id)
-					{
-						event.executing = false;
-						return true;
-					}
-					else
-					{
-						if (event.execuded)
-						{
-							events.splice(index, 1);
-							count--;
-							index--;
-						}
-					}
+					return false;
 				}
-				return false;
+				else
+				{
+					event.executing = false;
+					events.remove(event.id);
+					return true;
+				}
 			};
 		};
 		
 		thoth.Event.global = new thoth.Event();
-	}
-)(window.thoth = (window.thoth || {}), window);
-
-(	/* Dictionary */
-	function(thoth, window, undefined)
-	{
-		thoth.Dictionary = function()
-		{
-			var indexer = {};
-			var list = [];
-			
-			//----------------------------------------------------------
-			
-			this.contains = function (value) //Not used
-			{
-				return thoth.contains(list, value);
-			}
-			
-			this.containsKey = function (key)
-			{
-				if (key in indexer)
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			
-			this.containsWhere = function (predicate) //Not used
-			{
-				return thoth.containsWhere(list, predicate);
-			}
-			
-			this.every = function(callback)
-			{
-				return thoth.every(
-					list,
-					callback
-				);
-			}
-			
-			this.forEach = function(callback)
-			{
-				thoth.forEach(
-					list,
-					callback
-				);
-			}
-			
-			this.get = function (key)
-			{
-				if (key in indexer)
-				{
-					return list[indexer[key]];
-				}
-				else
-				{
-					return undefined;
-				}
-			}
-			
-			this.length = function()
-			{
-				return list.length;
-			}
-			
-			this.remove = function (key)
-			{
-				if (key in indexer)
-				{
-					var index = indexer[key];
-					var result = list[index];
-					delete indexer[key];
-					list.splice(index, 1);
-					return result;
-				}
-				else
-				{
-					return undefined;
-				}
-			}
-			
-			this.removeWhere = function (predicate) //Not Used
-			{
-				var result = 0;
-				for (var _index in indexer)
-				{
-					var index = indexer[_index];
-					if (predicate(list[index]))
-					{
-						list.splice(index, 1);
-						delete indexer[_index];
-						result++;
-					}
-				}
-				return result;
-			}
-			
-			this.set = function(key, item)
-			{
-				if (key in indexer)
-				{
-					indexer[key] = item;
-				}
-				else
-				{
-					var index = list.length;
-					indexer[key] = index;
-					list[index] = item;
-				}
-			}
-			
-			this.take = function()
-			{
-				for (var _index in indexer)
-				{
-					var index = indexer[_index];
-					var result = list[index];
-					list.splice(index, 1);
-					delete indexer[_index];
-					return result;
-				}
-			}
-			
-			this.toString = function()
-			{
-				var result = '';
-				var first = true;
-				for (var _index in indexer)
-				{
-					var index = indexer[_index];
-					if (first)
-					{
-						first = false;
-					}
-					else
-					{
-						result += ',';
-					}
-					result += _index;
-				}
-				return result;
-			}
-		}
 	}
 )(window.thoth = (window.thoth || {}), window);
 
