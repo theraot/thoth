@@ -1252,10 +1252,10 @@
 		thoth.config.autoGatherModuleNames = false;
 		thoth.config.autoLoadModules = false;
 		
-		var require = window.require = thoth.require;
-		var include = window.include = thoth.include;
-		var include = window.include_once = thoth.include_once;
-		var define = window.define = thoth.define;
+		window.require = thoth.require;
+		window.include = thoth.include;
+		window.include_once = thoth.include_once;
+		window.define = thoth.define;
 		
 		/* partial implementation of https://github.com/amdjs/amdjs-api/wiki */
 		thoth.define.amd = {};
@@ -1267,7 +1267,7 @@
 			var meta = metaElements[index];
 			if (meta.getAttribute('name') == 'thoth-load-script')
 			{
-				include(meta.getAttribute('content'));
+				thoth.include_once(meta.getAttribute('content'));
 			}
 		}
 	}
