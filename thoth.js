@@ -1189,6 +1189,10 @@
 						{
 							_include(_url, function(){thoth.delay(go, 0, false);});
 						}
+						else
+						{
+							thoth.delay(go, 0, false);
+						}
 					}
 					else
 					{
