@@ -471,18 +471,26 @@
 			{
 				if (event.executing)
 				{
-					var continuations = event.continuations;
-					var count = continuations.length;
-					for (var index = 0; event.executing && index < count; index++)
+					var callin = function()
 					{
-						var continuation = continuations[index];
-						continuation();
-						continuations.splice(index, 1);
-						count--;
-						index--;
-					}
-					event.executing = false;
-					events.remove(event.id);
+						step(event);
+					};
+					var step = function(event)
+					{
+						var continuations = event.continuations;
+						if (continuations.length > 0)
+						{
+							var continuation = thoth.take(event.continuations);
+							continuation();
+							thoth.delay(callin, 0, false);
+						}
+						else
+						{
+							event.executing = false;
+							events.remove(event.id);
+						}
+					};
+					thoth.delay(callin, 0, false);
 				}
 			}
 			
