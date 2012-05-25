@@ -57,7 +57,7 @@
 			};
 		}
 		
-		if (Array.prototype.forEach)
+		if (Array.prototype.forEach) //Not used
 		{
 			thoth.forEach = function(array, callback)
 			{
@@ -111,7 +111,7 @@
 			return array[array.length] = item;
 		};
 		
-		thoth.put = function(array, item)
+		thoth.put = function(array, item) //Not used
 		{
 			array.splice(0, 0, item);
 		};
@@ -132,7 +132,7 @@
 			return false;
 		};
 		
-		thoth.removeAt = function(array, key)
+		thoth.removeAt = function(array, key) //Not used
 		{
 			if (key in array)
 			{
@@ -145,7 +145,7 @@
 			}
 		};
 		
-		thoth.removeWhere = function(array, predicate)
+		thoth.removeWhere = function(array, predicate) //Not used
 		{
 			var result = 0;
 			var count = array.length;
@@ -568,459 +568,9 @@
 (	/* include */
 	function(thoth, window, undefined)
 	{
-		var pending_modules = new thoth.Dictionary();
-		var anonymous_modules = [];
-		var loaded_modules = new thoth.Dictionary();
 		var loaded_urls = [];
-		var event_hub = new thoth.Event();
-		
-		function createInternalRequire(current_module)
-		{
-			var result = _require;
-			
-			result.toUrl = function(str)
-			{
-				var computed_path = computePath(str);
-				if ((computed_path[computed_path.length - 1].split('.')).length > 1)
-				{
-					return computed_path.join('/');
-				}
-				else
-				{
-					return computed_path.join('/') + '.js';
-				}
-			};
-			
-			return result;
-		};
-		
-		function createInternalExports(current_module)
-		{
-			return {};
-		}
-		
-		function createInternalModule(current_module)
-		{
-			return {
-				id : current_module.name
-			};
-		}
-		
-		loaded_modules.set('require', {devil: createInternalRequire, cache : false});
-		loaded_modules.set('exports', {devil: createInternalExports, cache : false});
-		loaded_modules.set('module', {devil: createInternalModule, cache : false});
 		
 		//--------------------------------------------------------------
-		
-		function processDependencies(current_module, dependencies)
-		{
-			var pending_dependencies = [];
-			var processed_dependencies = [];
-			var relative_to = current_module.path;
-			thoth.forEach (
-				dependencies,
-				function(current)
-				{
-					var processed_id = process_id(current, relative_to)
-					var _current = processed_id.fullname;
-					if (loaded_modules.containsKey(_current))
-					{
-						var loaded_module = loaded_modules.get(_current);
-						current_module.fillParameter(_current, loaded_module.devil, loaded_module.cache);
-					}
-					else if (current_module.notify)
-					{
-						thoth.put (pending_dependencies, _current);
-						event_hub.add (
-							_current,
-							function()
-							{
-								current_module.load_handler(_current);
-							}
-						);
-					}
-					thoth.push (processed_dependencies, _current);
-				}
-			);
-			current_module.pending_dependencies = pending_dependencies;
-			current_module.dependencies = processed_dependencies;
-		};
-		
-		function createModule(id, dependencies, factory, referal)
-		{
-			var current_module = {};
-			var parameters = [];
-			var parametersCache = [];
-			var processed_id = process_id(id, referal === null ? null : referal.path);
-			if (loaded_modules.containsKey(processed_id.fullname))
-			{
-				return loaded_modules.get(processed_id.fullname);
-			}
-			else
-			{
-				current_module.path = processed_id.path;
-				current_module.name = processed_id.name;
-				current_module.fullname = processed_id.fullname;
-				current_module.plugins = processed_id.plugins;
-				current_module.factory = factory,
-				current_module.fillParameter = function(name, value, cache)
-				{
-					if (cache)
-					{
-						parametersCache[name] = value;
-						if (name in parameters)
-						{
-							delete parameters[name];
-						}
-					}
-					else
-					{
-						if (name in parametersCache)
-						{
-							delete parametersCache[name];
-						}
-						parameters[name] = value;
-					}
-				};
-				current_module.readParameter = function(name)
-				{
-					if (name in parametersCache)
-					{
-						return parametersCache[name];
-					}
-					else
-					{
-						var value = parameters[name];
-						if (typeof value === 'function')
-						{
-							var tmp = value(current_module);
-							if (typeof tmp !== 'undefined')
-							{
-								parametersCache[name] = tmp;
-							}
-							return tmp;
-						}
-						else
-						{
-							parametersCache[name] = value;
-							return value;
-						}
-					}
-				};
-				current_module.hasParameter = function(name)
-				{
-					return name in parameters;
-				};
-				current_module.load = function()
-				{
-					load(current_module);
-				};
-				current_module.load_handler = function(fullname)
-				{
-					if (thoth.remove(current_module.pending_dependencies, fullname))
-					{
-						if (loaded_modules.containsKey(fullname))
-						{
-							var loaded_module = loaded_modules.get(fullname);
-							current_module.fillParameter(fullname, loaded_module.devil, loaded_module.cache);
-						}
-						else
-						{
-							current_module.fillParameter(fullname, undefined);
-						}
-						thoth.delay(current_module.load, 0, false);
-					}
-				};
-				current_module.notify = true;
-				processDependencies(current_module, dependencies);
-				if (current_module.pending_dependencies.length > 0)
-				{
-					if (current_module.name === '' )
-					{
-						thoth.push(anonymous_modules, current_module);
-					}
-					else
-					{
-						pending_modules.set(current_module.fullname, current_module);
-					}
-				}
-				return current_module;
-			}
-		};
-		
-		//--------------------------------------------------------------
-		
-		function validateDependencies (dependencies)
-		{
-			if (thoth.isArray(dependencies))
-			{
-				return thoth.every(
-					dependencies,
-					function(current)
-					{
-						return typeof current === 'string';
-					}
-				);
-			}
-			else
-			{
-				return false;
-			}
-		};
-		
-		function computePath(target, relative_to)
-		{
-			var path;
-			if (typeof relative_to === 'string')
-			{
-				path = relative_to.split('/').concat(target.split('/'));
-			}
-			else
-			{
-				path = target.split('/')
-			}
-			var length = path.length;
-			var computed_path = [];
-			for (var index = 0; index < length; index ++)
-			{
-				if (path[index] === '.')
-				{
-					continue;
-				}
-				else if (path[index] === '..')
-				{
-					if (computed_path.length > 0)
-					{
-						thoth.pop(computed_path);
-					}
-					else
-					{
-						thoth.push(computed_path, '..');
-					}
-				}
-				else
-				{
-					thoth.push(computed_path, path[index]);
-				}
-			}
-			if (computed_path.length === 0)
-			{
-				computed_path = ['.'];
-			}
-			return computed_path;
-		};
-		
-		function process_id(id, relative_to)
-		{
-			var plugins = id.split('!');
-			var name = thoth.pop(plugins);
-			var path = name === '' ? [] : computePath(name, null);
-			if (name !== '')
-			{
-				name = thoth.pop(path);
-			}
-			if (name === '.' || name === '..')
-			{
-				throw 'Invalid id "' + id + '"';
-			}
-			else
-			{
-				var _path = path.join('/'); 
-				var fullname = _path !== '' ? _path + '/' + name : name;
-				return {
-					path : _path,
-					name : name,
-					fullname : fullname,
-					plugins : plugins
-				};
-			}
-		};
-		
-		function doEvil(current_module)
-		{
-			var devil = undefined;
-			if (typeof current_module.factory === 'function')
-			{
-				var evil = 'current_module.factory(';
-				for (var index = 0; index < current_module.dependencies.length; index++)
-				{
-					var dependency = current_module.dependencies[index];
-					if (index != 0)
-					{
-						evil += ', ';
-					}
-					evil += 'current_module.readParameter("' + dependency + '")';
-				}
-				evil += ')';
-				devil = eval(evil);
-			}
-			else
-			{
-				devil = current_module.factory;
-			}
-			if (typeof devil === 'undefined' && current_module.hasParameter('exports'))
-			{
-				devil = current_module.readParameter('exports');
-			}
-			if (current_module.name === '')
-			{
-				thoth.remove(anonymous_modules, current_module);
-				if (thoth.config.autoGatherModuleNames && !current_module.required && typeof devil !== 'undefined' && typeof devil.name === 'string')
-				{
-					current_module.name = devil.name;
-					current_module.fullname = current_module.path !== '' ? current_module.path + '/' + current_module.name : current_module.name;
-					current_module.cache = true;
-					current_module.devil = devil;
-					loaded_modules.set(current_module.fullname, current_module);
-					event_hub.go(current_module.fullname);
-				}
-			}
-			else
-			{
-				pending_modules.remove(current_module.fullname);
-				current_module.cache = true;
-				current_module.devil = devil;
-				loaded_modules.set(current_module.fullname, current_module);
-				event_hub.go(current_module.fullname);
-			}
-		};
-		
-		function createLoadState(sync)
-		{
-			var result = {};
-			result.modules_to_load = new thoth.Dictionary(),
-			result.delay_module = function (current_module)
-			{
-				result.modules_to_load.set(current_module.fullname, current_module);
-				current_module.delayed = true;
-			},
-			result.skip_dependency = function (current_module, current_dependency)
-			{
-				thoth.push(current_module.pending_dependencies, current_dependency);
-			}
-			result.sync = sync ? true : false;
-			return result;
-		};
-		
-		function load(current_module, sync)
-		{
-			if (typeof current_module !== 'undefined')
-			{
-				var state = createLoadState(sync);
-				
-				state.modules_to_load.set(current_module.fullname, current_module);
-				
-				var callin = function ()
-				{
-					step(state);
-				}
-				
-				var step = function(state)
-				{
-					do
-					{
-						if (state.modules_to_load.length() > 0)
-						{
-							var current_module = state.modules_to_load.take();
-							if (loaded_modules.containsKey(current_module.fullname))
-							{
-								thoth.delay(callin, 0, false);
-								return;
-							}
-							else
-							{
-								var _load = true;
-								while (current_module.pending_dependencies.length > 0)
-								{
-									var current_dependency = thoth.pop(current_module.pending_dependencies);
-									if (current_module.hasParameter(current_dependency))
-									{
-										continue;
-									}
-									else if (loaded_modules.containsKey(current_dependency))
-									{
-										var loaded_module = loaded_modules.get(current_dependency);
-										current_module.fillParameter(current_dependency, loaded_module.devil, loaded_module.cache);
-										continue;
-									}
-									else if (pending_modules.containsKey(current_dependency))
-									{
-										//We may have a circular reference, we will fill the parameter and continue to load meanwhile
-										var module = pending_modules.get(current_dependency);
-										current_module.fillParameter
-										(
-											current_dependency,
-											function()
-											{
-												var fullname = module.fullname;
-												load(module, true);
-												if (loaded_modules.containsKey(fullname))
-												{
-													var loaded_module = loaded_modules.get(fullname);
-													if (loaded_module.cache)
-													{
-														return loaded_module.devil;
-													}
-													else
-													{
-														return loaded_module.devil();
-													}
-												}
-												else
-												{
-													return undefined;
-												}
-											}
-										);
-										if (!module.delayed && !current_module.delayed)
-										{
-											state.delay_module(current_module);
-											_load = false;
-											continue;
-										}
-									}
-									//----
-									{
-										state.skip_dependency(current_module, current_dependency);
-										if (thoth.config.autoIncludeFiles)
-										{
-											var url = current_dependency + '.js';
-											if (!thoth.contains(loaded_urls, url))
-											{
-												_include(url);
-											}
-										}
-										//
-										_load = false;
-										break;
-									}
-								}
-								if (_load)
-								{
-									doEvil(current_module);
-									return;
-								}
-								else if (state.modules_to_load.length() > 0)
-								{
-									if (!sync)
-									{
-										thoth.delay(callin, 0, false);
-									}
-								}
-							}
-						}
-					}while(state.sync && state.modules_to_load.length() > 0);
-				}
-				if (sync)
-				{
-					callin();
-				}
-				else
-				{
-					thoth.delay(callin, 0, false);
-				}
-			}
-		};
 		
 		function _include(url, callback)
 		{
@@ -1054,96 +604,7 @@
 			head.insertBefore(script, head.firstChild);
 		};
 		
-		function _buildModule (id, dependencies, factory)
-		{
-			//For anonymous functions
-			if (typeof id !== 'string')
-			{
-				factory = dependencies;
-				dependencies = id;
-				id = '';
-			}
-			//Dependencies defaults
-			if (typeof factory === 'undefined')
-			{
-				if (typeof dependencies === 'function')
-				{
-					factory = dependencies;
-					dependencies = ["require", "exports", "module"];
-				}
-				else 
-				{
-					var result = dependencies;
-					factory = function(){return result;}
-					dependencies = ["require", "exports", "module"];
-				}
-			}
-			else if (typeof dependencies === 'undefined')
-			{
-				dependencies = ["require", "exports", "module"];
-			}
-			if (typeof id !== 'string' || !thoth.isArray(dependencies))
-			{
-				throw 'Invalid Arguments on function define';
-			}
-			else
-			{
-				if (!validateDependencies(dependencies))
-				{
-					throw 'Invalid Argument dependencies on function define';
-				}
-				else
-				{
-					return current_module = createModule(id, dependencies, factory, null);
-				}
-			}
-		}
-		
-		function _require(dependencies, factory)
-		{
-			var unique = false;
-			if (typeof dependencies === 'string')
-			{
-				dependencies = [dependencies];
-				unique = true;
-			}
-			if (typeof factory !== 'function')
-			{
-				factory = function(){};
-			}
-			var current_module = _buildModule('', dependencies, factory);
-			var result = [];
-			var fakeModule =
-			{
-				path : current_module.path,
-				notify : false,
-				fillParameter : function(name, value, cache)
-				{
-					if (cache)
-					{
-						result[name] = value;
-					}
-				}
-			};
-			processDependencies(fakeModule, dependencies);
-			current_module.required = true;
-			current_module.load();
-			if (unique)
-			{
-				return result[dependencies[0]];
-			}
-			else
-			{
-				return result;
-			}
-		}
-		
 		//--------------------------------------------------------------
-		
-		thoth.require = function(dependencies, factory)
-		{
-			return _require(dependencies, factory);
-		};
 		
 		thoth.include = function(url, callback)
 		{
@@ -1203,30 +664,11 @@
 			}
 		};
 		
-		thoth.define = function(id, dependencies, factory)
-		{
-			var current_module = _buildModule(id, dependencies, factory);
-			if (thoth.config.autoLoadModules)
-			{
-				current_module.load();
-			}
-		};
 		
 		//--------------------------------------------------------------
 		
-		thoth.config = {};
-		thoth.config.autoIncludeFiles = false;
-		thoth.config.autoGatherModuleNames = false;
-		thoth.config.autoLoadModules = false;
-		
-		window.require = thoth.require;
 		window.include = thoth.include;
 		window.include_once = thoth.include_once;
-		window.define = thoth.define;
-		
-		/* partial implementation of https://github.com/amdjs/amdjs-api/wiki */
-		thoth.define.amd = {};
-		window.define.amd = thoth.define.amd;
 		
 		var metaElements = window.document.getElementsByTagName('meta');
 		for (var index = 0; index < metaElements.length; index++)
@@ -1239,11 +681,3 @@
 		}
 	}
 )(window.thoth = (window.thoth || {}), window);
-
-window.thoth.define(
-	'thoth',
-	function()
-	{
-		return window.thoth;
-	}
-);
