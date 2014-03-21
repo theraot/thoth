@@ -760,7 +760,11 @@
 							{
 								if (document.readyState === 'loaded' || document.readyState === 'interactive' || document.readyState === 'complete')
 								{
-									callback();
+									if (callback !== null)
+									{
+										callback();
+										callback = null;
+									}
 								}
 							}
 						);
