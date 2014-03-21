@@ -667,6 +667,112 @@
 	}
 )(window.thoth = (window.thoth || {}), window);
 
+(	/* Events */
+	function(thoth, window, undefined)
+	{
+		function addEventListener(element, eventName, handler)
+		{
+			if ("addEventListener" in element)
+			{
+				element.addEventListener(eventName, handler);
+			}
+			else
+			{
+				element.attachEvent (
+					'on' + eventName,
+					function()
+					{
+						handler.call(element);
+					}
+				);
+			}
+		}
+		
+		function removeEventListener(element, eventName, handler)
+		{
+			if ("removeEventListener" in element)
+			{
+				element.removeEventListener(eventName, handler);
+			}
+			else
+			{
+				element.detachEvent('on' + eventName, handler);
+			}
+		}
+		
+		thoth.on = function(element, events, handler)
+		{
+			if (typeof handler === 'function')
+			{
+				if (Array.isArray(events))
+				{
+					var index = 0;
+					for (; index < events.length; index++)
+					{
+						addEventListener(element, events[index], handler);
+					}
+				}
+				else
+				{
+					addEventListener(element, events, handler);
+				}
+			}
+		}
+		
+		thoth.off = function(element, events, handler)
+		{
+			if (typeof handler === 'function')
+			{
+				if (Array.isArray(events))
+				{
+					var index = 0;
+					for (; index < events.length; index++)
+					{
+						removeEventListener(element, events[index], handler);
+					}
+				}
+				else
+				{
+					removeEventListener(element, events, handler);
+				}
+			}
+		}
+		
+		thoth.ready = function(callback)
+		{
+			if (typeof callback === 'function')
+			{
+				onreadystatechange
+				if (document.readyState === 'loaded' || document.readyState === 'interactive' || document.readyState === 'complete')
+				{
+					callback();
+				}
+				else
+				{
+					if ("addEventListener" in document)
+					{
+						document.addEventListener('DOMContentLoaded', callback);
+					}
+					else
+					{
+						element.attachEvent (
+							'onreadystatechange'
+							function()
+							{
+								if (document.readyState === 'loaded' || document.readyState === 'interactive' || document.readyState === 'complete')
+								{
+									callback();
+								}
+							}
+						);
+					}
+				}
+			}
+		}
+	}
+)(window.thoth = (window.thoth || {}), window);
+
+
 (	/* include */
 	function(thoth, window, undefined)
 	{
@@ -684,7 +790,7 @@
 			{
 				script.onload = script.onreadystatechange = function()
 				{
-					if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete"))
+					if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "interactive" || this.readyState === "complete"))
 					{
 						done = true;
 						if (!loaded_urls.contains(url))
