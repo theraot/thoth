@@ -95,6 +95,33 @@
 			};
 		}
 		
+		if (!("filter" in Array.prototype))
+		{
+			Array.prototype.filter = function(callback /*, thisArg */)
+			{
+				if (this === void 0 || this === null || typeof callback !== "function")
+				{
+					throw new TypeError();
+				}
+				var array = Object(this);
+				var count = array.length >>> 0;
+				var result = [];
+				var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+				for (var index = 0; index < count; index++)
+				{
+					if (index in array)
+					{
+						var current = array[index]
+						if (callback.call(thisArg, current, index, array))
+						{
+							result[result.length] = current;
+						}
+					}
+				}
+				return result;
+			};
+		}
+		
 		if (!("forEach" in Array.prototype))
 		{
 			Array.prototype.forEach = function(callback /*, thisArg*/)
@@ -113,6 +140,39 @@
 						callback.call(thisArg, array[index], index, array);
 					}
 				}
+			};
+		}
+		
+		if (!("indexOf" in Array.prototype))
+		{
+			Array.prototype.indexOf = function (item, fromIndex)
+			{
+				if (this === void 0 || this === null)
+				{
+					throw new TypeError();
+				}
+				var array = Object(this);
+				var count = array.length >>> 0;
+				fromIndex = +fromIndex || 0;
+				if (fromIndex < count)
+				{
+					if (fromIndex < 0)
+					{
+						fromIndex += length;
+						if (fromIndex < 0)
+						{
+							fromIndex  0;
+						}
+					}
+					for (var index = fromIndex; index < count; index++)
+					{
+						if (index in array && array[index] === item)
+						{
+							return index;
+						}
+					}
+				}
+				return -1;
 			};
 		}
 		
