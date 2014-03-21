@@ -556,10 +556,10 @@
 	}
 )(window.thoth = (window.thoth || {}), window);
 
-(	/* Event */
+(	/* Dispatch */
 	function(thoth, window, undefined)
 	{
-		thoth.Event = function()
+		thoth.Dispatch = function()
 		{
 			var events = new thoth.Dictionary();
 			
@@ -663,7 +663,7 @@
 			};
 		};
 		
-		thoth.Event.global = new thoth.Event();
+		thoth.Dispatch.global = new thoth.Dispatch();
 	}
 )(window.thoth = (window.thoth || {}), window);
 
