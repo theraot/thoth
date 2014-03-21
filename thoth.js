@@ -161,7 +161,7 @@
 						fromIndex += length;
 						if (fromIndex < 0)
 						{
-							fromIndex  0;
+							fromIndex = 0;
 						}
 					}
 					for (var index = fromIndex; index < count; index++)
@@ -742,7 +742,6 @@
 		{
 			if (typeof callback === 'function')
 			{
-				onreadystatechange
 				if (document.readyState === 'loaded' || document.readyState === 'interactive' || document.readyState === 'complete')
 				{
 					callback();
@@ -756,7 +755,7 @@
 					else
 					{
 						element.attachEvent (
-							'onreadystatechange'
+							'onreadystatechange',
 							function()
 							{
 								if (document.readyState === 'loaded' || document.readyState === 'interactive' || document.readyState === 'complete')
