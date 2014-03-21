@@ -1,54 +1,67 @@
 /* thoth by Alfonso J. Ramos is licensed under a Creative Commons Attribution 3.0 Unported License. Based on a work at github.com. To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ */
+
+'use strict';
+
 (	/* arrays */
 	function(thoth, window, undefined)
 	{
-		thoth.contains = function (array, item)
+		if (!("contains" in Array.prototype))
 		{
-			var count = array.length;
-			var current;
-			for (var index = 0; index < count; index++)
+			Array.prototype.contains = function (item)
 			{
-				current = array[index];
-				if (current === item)
+				if (this === void 0 || this === null)
 				{
-					return true;
+					throw new TypeError();
 				}
-			}
-			return false;
-		};
-		
-		thoth.containsWhere = function (array, predicate) //Not used
-		{
-			var count = array.length;
-			var current;
-			for (var index = 0; index < count; index++)
-			{
-				current = array[index];
-				if (predicate(current))
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		if (Array.prototype.every)	//Not used
-		{
-			thoth.every = function(array, callback)
-			{
-				return array.every(callback);
-			};
-		}
-		else
-		{
-			thoth.every = function(array, callback)
-			{
-				var count = array.length;
-				var current;
+				var array = Object(this);
+				var count = array.length >>> 0;
 				for (var index = 0; index < count; index++)
 				{
-					current = array[index];
-					if (!callback(current))
+					if (index in array && array[index] === item)
+					{
+						return true;
+					}
+				}
+				return false;
+			};
+		}
+		
+		if (!("containsWhere" in Array.prototype))
+		{
+			Array.prototype.containsWhere = function (predicate /*, thisArg*/)
+			{
+				if (this === void 0 || this === null || typeof predicate !== "function")
+				{
+					throw new TypeError();
+				}
+				var array = Object(this);
+				var count = array.length >>> 0;
+				var thisArg = arguments.lengths >= 2 ? arguments[1] : void 0;
+				for (var index = 0; index < count; index++)
+				{
+					if (index in array && predicate.call(thisArg, array[index], index, array))
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		
+		if (!("every" in Array.prototype))
+		{
+			Array.prototype.every = function(callback /*, thisArg*/)
+			{
+				if (this === void 0 || this === null || typeof callback !== "function")
+				{
+					throw new TypeError();
+				}
+				var array = Object(this);
+				var count = array.length >>> 0;
+				var thisArg = arguments.lengths >= 2 ? arguments[1] : void 0;
+				for (var index = 0; index < count; index++)
+				{
+					if (index in array && !callback.call(thisArg, array[index], index, array))
 					{
 						return false;
 					}
@@ -57,117 +70,105 @@
 			};
 		}
 		
-		if (Array.prototype.forEach) //Not used
+		if (!("forEach" in Array.prototype))
 		{
-			thoth.forEach = function(array, callback)
+			Array.prototype.forEach = function(callback /*, thisArg*/)
 			{
-				array.forEach(callback);
-			};
-		}
-		else
-		{
-			thoth.forEach = function(array, callback)
-			{
-				var count = array.length;
-				var current;
+				if (this === void 0 || this === null || typeof callback !== "function")
+				{
+					throw new TypeError();
+				}
+				var array = Object(this);
+				var count = array.length >>> 0;
+				var thisArg = arguments.lengths >= 2 ? arguments[1] : void 0;
 				for (var index = 0; index < count; index++)
 				{
-					current = array[index];
-					callback(current);
+					if (index in array)
+					{
+						callback.call(thisArg, array[index], index, array);
+					}
 				}
 			};
 		}
 		
-		if (Array.isArray)
+		if (!("isArray" in Array))
 		{
-			thoth.isArray = function(array)
-			{
-				return Array.isArray(array);
-			};
-		}
-		else
-		{
-			thoth.isArray = function(array)
+			Array.isArray = function(arg)
 			{
 				return typeof array === 'object' && array instanceof Array;
+			}
+		}
+		
+		if (!("remove" in Array.prototype))
+		{
+			Array.prototype.remove = function(item)
+			{
+				if (this === void 0 || this === null)
+				{
+					throw new TypeError();
+				}
+				var array = Object(this);
+				var count = array.length >>> 0;
+				for (var index = 0; index < count; index++)
+				{
+					if (index in array && array[index] === item)
+					{
+						Array.prototype.splice.call(this, index, 1);
+						return true;
+					}
+				}
+				return false;
 			};
 		}
 		
-		thoth.pass = function(array_source, array_target)
+		if (!("removeAt" in Array.prototype))
 		{
-			return thoth.push(array_target, thoth.pop(array_source));
-		};
-		
-		thoth.pop = function(array)
-		{
-			var index = array.length - 1;
-			var result = array[index];
-			array.splice(index, 1);
-			return result;
-		};
-		
-		thoth.push = function(array, item)
-		{
-			return array[array.length] = item;
-		};
-		
-		thoth.put = function(array, item) //Not used
-		{
-			array.splice(0, 0, item);
-		};
-		
-		thoth.remove = function(array, item)
-		{
-			var count = array.length;
-			var current;
-			for (var index = 0; index < count; index++)
+			Array.prototype.removeAt = function(key)
 			{
-				current = array[index];
-				if (current === item)
+				if (this === void 0 || this === null)
 				{
-					array.splice(index, 1);
+					throw new TypeError();
+				}
+				var array = Object(this);
+				if (key in array)
+				{
+					Array.prototype.splice.call(this, key, 1);
 					return true;
 				}
-			}
-			return false;
-		};
-		
-		thoth.removeAt = function(array, key) //Not used
-		{
-			if (key in array)
-			{
-				array.splice(key, 1);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		};
-		
-		thoth.removeWhere = function(array, predicate) //Not used
-		{
-			var result = 0;
-			var count = array.length;
-			var current;
-			for (var index = 0; index < count; index++)
-			{
-				current = array[index];
-				if (predicate(current))
+				else
 				{
-					array.splice(index, 1);
-					result++;
+					return false;
 				}
-			}
-			return result;
+			};
 		}
 		
-		thoth.take = function(array)
+		if (!("removeWhere" in Array.prototype))
 		{
-			var result = array[0];
-			array.splice(0, 1);
-			return result;
-		};
+			Array.prototype.removeWhere = function(predicate /*, thisArg*/)
+			{
+				if (this === void 0 || this === null || typeof predicate !== "function")
+				{
+					throw new TypeError();
+				}
+				var array = Object(this);
+				var result = 0;
+				var count = array.length >>> 0;
+				var thisArg = arguments.lengths >= 2 ? arguments[1] : void 0;
+				for (var index = 0; index < count;)
+				{
+					if (index in array && predicate.call(thisArg, array[index], index, array))
+					{
+						Array.prototype.splice.call(this, index, 1);
+						result++;
+					}
+					else
+					{
+						index++
+					}
+				}
+				return result;
+			};
+		}
 	}
 )(window.thoth = (window.thoth || {}), window);
 
@@ -180,19 +181,20 @@
 		
 		function _get_delayed_id()
 		{
-			var id = thoth.pass(free_delayed_ids, used_delayed_ids);
+			var id = free_delayed_ids.pop();
+			used_delayed_ids.push(id);
 			if (free_delayed_ids.length === 0)
 			{
-				thoth.push(free_delayed_ids, used_delayed_ids.length);
+				free_delayed_ids.push(used_delayed_ids.length);
 			}
 			return id;
 		};
 		
 		function _free_delayed_id(id)
 		{
-			if (thoth.remove(used_delayed_ids, id))
+			if (used_delayed_ids.remove(id))
 			{
-				thoth.push(free_delayed_ids, id);
+				free_delayed_ids.push(id);
 			}
 		};
 		
@@ -271,7 +273,7 @@
 				done: _done,
 				repeat : _repeat
 			}
-			thoth.push(delayed_operations, delayed_operation);
+			delayed_operations.push(delayed_operation);
 			var timeout_id = setTimeout(function(){_run_delayed(id);}, delay);
 			delayed_operation.timeout_id = timeout_id;
 			return id;
@@ -495,7 +497,7 @@
 						var continuations = event.continuations;
 						if (continuations.length > 0)
 						{
-							var continuation = thoth.take(event.continuations);
+							var continuation = event.continuations.shift();
 							continuation();
 							thoth.delay(callin, 0, false);
 						}
@@ -518,7 +520,7 @@
 				}
 				else
 				{
-					thoth.push(event.continuations, continuation);
+					event.continuations.push(continuation);
 					return true;
 				}
 			};
@@ -600,9 +602,9 @@
 					if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete"))
 					{
 						done = true;
-						if (!thoth.contains(loaded_urls, url))
+						if (!loaded_urls.contains(url))
 						{
-							thoth.push(loaded_urls, url);
+							loaded_urls.push(url);
 						}
 						script.onload = script.onreadystatechange = null;
 						if (head && script.parentNode)
@@ -627,13 +629,13 @@
 			{
 				_include(url, callback);
 			}
-			else if (thoth.isArray(url))
+			else if (Array.isArray(url))
 			{
 				var go = function()
 				{
 					if (url.length > 0)
 					{
-						var _url = thoth.take(url);
+						var _url = url.shift();
 						_include(_url, function(){thoth.delay(go, 0, false);});
 					}
 					else
@@ -649,19 +651,19 @@
 		{
 			if (typeof url === 'string')
 			{
-				if (!thoth.contains(loaded_urls, url))
+				if (!loaded_urls.contains(url))
 				{
 					_include(url, callback);
 				}
 			}
-			else if (thoth.isArray(url))
+			else if (Array.isArray(url))
 			{
 				var go = function()
 				{
 					if (url.length > 0)
 					{
-						var _url = thoth.take(url);
-						if (!thoth.contains(loaded_urls, _url))
+						var _url = url.shift();
+						if (!loaded_urls.contains(_url))
 						{
 							_include(_url, function(){thoth.delay(go, 0, false);});
 						}
