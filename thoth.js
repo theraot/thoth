@@ -295,6 +295,21 @@
 			}
 			return false;
 		};
+		
+		thoth.isRunning = function (id)
+		{
+			var count = delayed_operations.length;
+			var delayed_operation;
+			for (var index = 0; index < count; index++)
+			{
+				delayed_operation = delayed_operations[index];
+				if (delayed_operation.id === id)
+				{
+					return true;
+				}
+			}
+			return false;
+		};
 	}
 )(window.thoth = (window.thoth || {}), window);
 
