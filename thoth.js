@@ -654,6 +654,11 @@
 				return true;
 			};
 			
+			this.containsKey = function(id)
+			{
+				return events.containsKey(id);
+			}
+			
 			this.go = function (id)
 			{
 				var event = events.get(id);
