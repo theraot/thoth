@@ -906,6 +906,25 @@
 			}
 		};
 		
+		thoth.url_exists = function (url, callback)
+		{
+			var http = new XMLHttpRequest();
+			var done = false;
+			http.onreadystatechange = function() 
+			{
+				if (http.readyState === 4)
+				{
+					http.onreadystatechange = null;
+					if (callback !== null)
+					{
+						callback (http.status != 404);
+						callback = null;
+					}
+				}
+			};
+			http.open('HEAD', url, true);
+			http.send();
+		}
 		
 		//--------------------------------------------------------------
 		
