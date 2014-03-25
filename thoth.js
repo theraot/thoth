@@ -810,11 +810,120 @@
 (	/* include */
 	function(thoth, window, undefined)
 	{
-		var loaded_urls = [];
+		var SEPARATOR = "/";
+		var _root_urls = [];
+		var included_urls = [];
+		var loading = new thoth.Dispatch();
 		
 		//--------------------------------------------------------------
 		
-		function _include(url, callback)
+		function _process_url(folders)
+		{
+			var result =  [];
+			var folder = null;
+			while (typeof (folder = folders.shift()) !== "undefined")
+			{
+				if (folder === ".")
+				{
+					continue;
+				}
+				if (folder === "..")
+				{
+					result.pop()
+					continue;
+				}
+				result.push(folder);
+			}
+			return result;
+		}
+		
+		function _process_absolute_url(absolute)
+		{
+			if (typeof absolute === "undefined")
+			{
+				return [];
+			}
+			else
+			{
+				if (absolute.endsWith(SEPARATOR))
+				{
+					absolute = absolute.substr(0, absolute.length - SEPARATOR.length);
+				}
+				var folders = absolute.split(SEPARATOR);
+				return _process_url(folders);
+			}
+		}
+		
+		function _process_relative_url(relative)
+		{
+			if (typeof relative === "undefined")
+			{
+				return ["."];
+			}
+			else
+			{
+				if (relative.startsWith(SEPARATOR))
+				{
+					relative = relative.substr(SEPARATOR.length);
+				}
+				if (relative === "")
+				{
+					return ["."];
+				}
+				else
+				{
+					var folders = relative.split(SEPARATOR);
+					return _process_url(folders);
+				}
+			}
+		}
+		
+		function _resolve_url(url, callback)
+		{
+			var check = url.indexOf("/");
+			if (check !== -1 && check === url.indexOf("//"))
+			{
+				//take as absolute or protocol relative
+				callback(url);
+			}
+			else
+			{
+				var index = 0;
+				var step = function()
+				{
+					if (index < _root_urls.length)
+					{
+						var test = _root_urls[index]; index++;
+						var _url = thoth.resolve_relative_url(test, url);
+						if (included_urls.contains(_url))
+						{
+							callback(_url);
+						}
+						else
+						{
+							thoth.url_exists (
+								_url,
+								function (exists)
+								{
+									if (exists)
+									{
+										callback(_url);
+										return true;
+									}
+									else
+									{
+										thoth.delay(step, 0, false);
+									}
+								}
+							);
+						}
+					}
+				};
+				step();
+			}
+		}
+		
+		function _include(url, callback, once)
 		{
 			var document = window.document;
 			var head = document.getElementsByTagName("head")[0] || document.documentElement;
@@ -827,23 +936,56 @@
 					if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "interactive" || this.readyState === "complete"))
 					{
 						done = true;
-						if (!loaded_urls.contains(url))
-						{
-							loaded_urls.push(url);
-						}
-						script.onload = script.onreadystatechange = null;
+						var data = this.getAttribute("data-src");
+						loading.go(data);
+						loading.remove(data);
+						this.onload = this.onreadystatechange = null;
 						if (head && script.parentNode)
 						{
 							head.removeChild(script);
 						}
-						callback();
 					}
-				};
+				}
+				_resolve_url (
+					url,
+					function (resolved_url)
+					{
+						var insert = false;
+						if (included_urls.contains(resolved_url))
+						{
+							if (once)
+							{
+								if (loading.containsKey(resolved_url))
+								{
+									loading.add(resolved_url, callback);
+								}
+								else
+								{
+									callback();
+								}
+							}
+							else
+							{
+								insert = true;
+							}
+						}
+						else
+						{
+							insert = true;
+							included_urls.push(resolved_url);
+						}
+						if (insert)
+						{
+							script.type = "text/javascript";
+							script.async = true;
+							script.src = resolved_url;
+							script.setAttribute("data-src", resolved_url);
+							loading.add(resolved_url, callback);
+							head.insertBefore(script, head.firstChild);
+						}
+					}
+				);
 			}
-			script.type = 'text/javascript';
-			script.async = true;
-			script.src = url;
-			head.insertBefore(script, head.firstChild);
 		};
 		
 		//--------------------------------------------------------------
@@ -852,7 +994,7 @@
 		{
 			if (typeof url === 'string')
 			{
-				_include(url, callback);
+				_include(url, callback, false);
 			}
 			else if (Array.isArray(url))
 			{
@@ -861,7 +1003,7 @@
 					if (url.length > 0)
 					{
 						var _url = url.shift();
-						_include(_url, function(){thoth.delay(go, 0, false);});
+						_include(_url, function(){thoth.delay(go, 0, false);}, false);
 					}
 					else
 					{
@@ -876,9 +1018,9 @@
 		{
 			if (typeof url === 'string')
 			{
-				if (!loaded_urls.contains(url))
+				if (!included_urls.contains(url))
 				{
-					_include(url, callback);
+					_include(url, callback, true);
 				}
 			}
 			else if (Array.isArray(url))
@@ -888,9 +1030,9 @@
 					if (url.length > 0)
 					{
 						var _url = url.shift();
-						if (!loaded_urls.contains(_url))
+						if (!included_urls.contains(_url))
 						{
-							_include(_url, function(){thoth.delay(go, 0, false);});
+							_include(_url, function(){thoth.delay(go, 0, false);}, true);
 						}
 						else
 						{
@@ -905,6 +1047,11 @@
 				thoth.delay(go, 0, false);
 			}
 		};
+		
+		thoth.configure = function(root_urls)
+		{
+			_root_urls = root_urls;
+		}
 		
 		thoth.url_exists = function (url, callback)
 		{
@@ -924,6 +1071,14 @@
 			};
 			http.open('HEAD', url, true);
 			http.send();
+		}
+		
+		thoth.resolve_relative_url = function (absolute, relative)
+		{
+			absolute = _process_absolute_url(absolute);
+			relative = _process_relative_url(relative);
+			var result = _process_url(absolute.concat(relative));
+			return result.join(SEPARATOR);
 		}
 		
 		//--------------------------------------------------------------
