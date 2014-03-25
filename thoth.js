@@ -560,18 +560,6 @@
 				dic[key] = item;
 			}
 			
-			this.take = function()
-			{
-				var result;
-				for (var key in dic)
-				{
-					result = dic[key];
-					delete dic[key];
-					length--;
-				}
-				return result;
-			}
-			
 			this.toString = function()
 			{
 				var result = '';
