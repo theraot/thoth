@@ -5,7 +5,7 @@
 (	/* strings */
 	function(thoth, window, undefined)
 	{
-		if (!String.format)
+		if (!("format" in String))
 		{
 			String.format = function(format)
 			{
