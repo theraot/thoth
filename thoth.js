@@ -785,7 +785,7 @@
 					}
 					else
 					{
-						element.attachEvent (
+						document.attachEvent (
 							'onreadystatechange',
 							function()
 							{
