@@ -671,7 +671,9 @@
 (	/* Events */
 	function(thoth, window, undefined)
 	{
-		function addEventListener(element, eventName, handler)
+		var events = {};
+		
+		function _addEventListener(element, eventName, handler)
 		{
 			if ("addEventListener" in element)
 			{
@@ -689,7 +691,7 @@
 			}
 		}
 		
-		function removeEventListener(element, eventName, handler)
+		function _removeEventListener(element, eventName, handler)
 		{
 			if ("removeEventListener" in element)
 			{
@@ -698,6 +700,38 @@
 			else
 			{
 				element.detachEvent('on' + eventName, handler);
+			}
+		}
+		
+		thoth.addEventListener = function(eventName, handler)
+		{
+			if (!(eventName in events))
+			{
+				events[eventName] = [];
+			}
+			events[eventName].push(handler);
+		}
+		
+		thoth.removeEventListener = function(eventName, handler)
+		{
+			if (eventName in events)
+			{
+				events[eventName].remove(handler);
+			}
+		}
+		
+		thoth.triggerEvent = function(eventName, event)
+		{
+			if (eventName in events)
+			{
+				for (var index = 0; index < events[eventName].length; index++)
+				{
+					var item = events[eventName][index];
+					if ('call' in item)
+					{
+						item.call(thoth, event);
+					}
+				}
 			}
 		}
 		
@@ -710,12 +744,12 @@
 					var index = 0;
 					for (; index < events.length; index++)
 					{
-						addEventListener(element, events[index], handler);
+						_addEventListener(element, events[index], handler);
 					}
 				}
 				else
 				{
-					addEventListener(element, events, handler);
+					_addEventListener(element, events, handler);
 				}
 			}
 		};
@@ -729,12 +763,12 @@
 					var index = 0;
 					for (; index < events.length; index++)
 					{
-						removeEventListener(element, events[index], handler);
+						_removeEventListener(element, events[index], handler);
 					}
 				}
 				else
 				{
-					removeEventListener(element, events, handler);
+					_removeEventListener(element, events, handler);
 				}
 			}
 		};
