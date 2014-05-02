@@ -1,4 +1,4 @@
-/* thoth by Alfonso J. Ramos is licensed under a Creative Commons Attribution 3.0 Unported License. Based on a work at github.com. To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ */
+/* thoth by Alfonso J. Ramos is licensed under a Creative Commons Attribution 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ */
 
 'use strict';
 
