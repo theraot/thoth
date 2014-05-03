@@ -683,9 +683,9 @@
 			{
 				element.attachEvent (
 					'on' + eventName,
-					function()
+					function(event)
 					{
-						handler.call(element);
+						handler.call(element, event);
 					}
 				);
 			}
