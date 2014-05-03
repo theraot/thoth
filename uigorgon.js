@@ -654,7 +654,7 @@
 					}
 				}
 			};
-			thoth.on(form, 'submit', submitHandler);
+			uigorgon.on(form, 'submit', submitHandler);
 		};
 		uigorgon.findField = function (form, type)
 		{
@@ -1041,6 +1041,119 @@
 			else
 			{
 				return null;
+			}
+		};
+		
+		var _events = {};
+		
+		function _addEventListener(element, eventName, handler)
+		{
+			if ("addEventListener" in element)
+			{
+				element.addEventListener(eventName, handler);
+				return function(){element.removeEventListener(eventName, handler);};
+			}
+			else
+			{
+				eventName = 'on' + eventName;
+				var _handler = function(event)
+				{
+					handler.call(element, event);
+				};
+				element.attachEvent(eventName, _handler);
+				return function() { element.detachEvent('on' + eventName, _handler); };
+			}
+		}
+
+		uigorgon.addEventListener = function(eventName, handler)
+		{
+			if (!(eventName in _events))
+			{
+				_events[eventName] = [];
+			}
+			_events[eventName].push(handler);
+		};
+		
+		uigorgon.removeEventListener = function(eventName, handler)
+		{
+			if (eventName in _events)
+			{
+				_events[eventName].remove(handler);
+			}
+		};
+		
+		uigorgon.triggerEvent = function(eventName, event)
+		{
+			if (eventName in _events)
+			{
+				for (var index = 0; index < _events[eventName].length; index++)
+				{
+					var item = _events[eventName][index];
+					if ('call' in item)
+					{
+						item.call(thoth, event);
+					}
+				}
+			}
+		};
+		
+		uigorgon.on = function(element, events, handler)
+		{
+			if (typeof handler === 'function')
+			{
+				if (Array.isArray(events))
+				{
+					var result = [];
+					var index = 0;
+					for (; index < events.length; index++)
+					{
+						result.push(_addEventListener(element, events[index], handler));
+					}
+					return result;
+				}
+				else
+				{
+					return _addEventListener(element, events, handler);
+				}
+			}
+			else
+			{
+				return null;
+			}
+		};
+		
+		uigorgon.ready = function(callback)
+		{
+			if (typeof callback === 'function')
+			{
+				if (window.document.readyState === 'loaded' || window.document.readyState === 'interactive' || window.document.readyState === 'complete')
+				{
+					callback();
+				}
+				else
+				{
+					if ("addEventListener" in window.document)
+					{
+						window.document.addEventListener('DOMContentLoaded', callback);
+					}
+					else
+					{
+						window.document.attachEvent (
+							'onreadystatechange',
+							function()
+							{
+								if (window.document.readyState === 'loaded' || window.document.readyState === 'interactive' || window.document.readyState === 'complete')
+								{
+									if (callback !== null)
+									{
+										callback();
+										callback = null;
+									}
+								}
+							}
+						);
+					}
+				}
 			}
 		};
 	}
