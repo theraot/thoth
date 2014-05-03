@@ -3,7 +3,7 @@
 'use strict';
 
 (
-	function (thoth, uigorgon, window, undefined)
+	function (uigorgon, window, undefined)
 	{
 		var months_31 = [1, 3, 5, 7, 8, 10, 12];
 		var years_53 = [
@@ -1091,7 +1091,7 @@
 					var item = _events[eventName][index];
 					if ('call' in item)
 					{
-						item.call(thoth, event);
+						item.call(uigorgon, event);
 					}
 				}
 			}
@@ -1101,7 +1101,7 @@
 		{
 			if (typeof handler === 'function')
 			{
-				if (Array.isArray(events))
+				if (typeof events === 'object' && events instanceof Array)
 				{
 					var result = [];
 					var index = 0;
@@ -1157,4 +1157,4 @@
 			}
 		};
 	}
-)(window.thoth = (window.thoth || {}), window.uigorgon = window.thoth.uigorgon = (window.thoth.uigorgon || {}), window);
+)(window.uigorgon = (window.uigorgon || {}), window);
