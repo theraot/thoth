@@ -678,28 +678,17 @@
 			if ("addEventListener" in element)
 			{
 				element.addEventListener(eventName, handler);
+				return function(){element.removeEventListener(eventName, handler);};
 			}
 			else
 			{
-				element.attachEvent (
-					'on' + eventName,
-					function(event)
-					{
-						handler.call(element, event);
-					}
-				);
-			}
-		}
-		
-		function _removeEventListener(element, eventName, handler)
-		{
-			if ("removeEventListener" in element)
-			{
-				element.removeEventListener(eventName, handler);
-			}
-			else
-			{
-				element.detachEvent('on' + eventName, handler);
+				eventName = 'on' + eventName;
+				var _handler = function(event)
+				{
+					handler.call(element, event);
+				};
+				element.attachEvent(eventName, _handler);
+				return function(){element.detachEvent('on' + eventName, _handler);}
 			}
 		}
 		
@@ -741,34 +730,17 @@
 			{
 				if (Array.isArray(events))
 				{
+					var result = [];
 					var index = 0;
 					for (; index < events.length; index++)
 					{
-						_addEventListener(element, events[index], handler);
+						result.push(_addEventListener(element, events[index], handler));
 					}
+					return result;
 				}
 				else
 				{
-					_addEventListener(element, events, handler);
-				}
-			}
-		};
-		
-		thoth.off = function(element, events, handler)
-		{
-			if (typeof handler === 'function')
-			{
-				if (Array.isArray(events))
-				{
-					var index = 0;
-					for (; index < events.length; index++)
-					{
-						_removeEventListener(element, events[index], handler);
-					}
-				}
-				else
-				{
-					_removeEventListener(element, events, handler);
+					return _addEventListener(element, events, handler);
 				}
 			}
 		};
