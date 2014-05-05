@@ -2,9 +2,20 @@
 
 'use strict';
 
-(
+( /* Form validation */
 	function (uigorgon, window, undefined)
 	{
+		uigorgon.VALIDATION_INVALID_ELEMENT = -1;
+		uigorgon.VALIDATION_NOT_VALIDABLE = -2;
+		uigorgon.VALIDATION_VALID = 0;
+		uigorgon.VALIDATION_TYPE_MISMATCH = 1;
+		uigorgon.VALIDATION_PATTERN_MISMATCH = 2;
+		uigorgon.VALIDATION_UNDERFLOW = 3;
+		uigorgon.VALIDATION_OVERFLOW = 4;
+		uigorgon.VALIDATION_MISSING = 5;
+		uigorgon.VALIDATION_STEP_MISMATCH = 6;
+		uigorgon.VALIDATION_TOO_LONG = 7;
+		uigorgon.VALIDATION_CUSTOM_FAILURE = 8;
 		var months_31 = [1, 3, 5, 7, 8, 10, 12];
 		var years_53 = [
 			  4,   9,  15,  20,  26,  32,  37,  43,  48,
@@ -177,17 +188,6 @@
 				return null;
 			}
 		}
-		uigorgon.VALIDATION_INVALID_ELEMENT = -1;
-		uigorgon.VALIDATION_NOT_VALIDABLE = -2;
-		uigorgon.VALIDATION_VALID = 0;
-		uigorgon.VALIDATION_TYPE_MISMATCH = 1;
-		uigorgon.VALIDATION_PATTERN_MISMATCH = 2;
-		uigorgon.VALIDATION_UNDERFLOW = 3;
-		uigorgon.VALIDATION_OVERFLOW = 4;
-		uigorgon.VALIDATION_MISSING = 5;
-		uigorgon.VALIDATION_STEP_MISMATCH = 6;
-		uigorgon.VALIDATION_TOO_LONG = 7;
-		uigorgon.VALIDATION_CUSTOM_FAILURE = 8;
 		function _validateField(field, validator)
 		{
 			var form = field.form;
@@ -420,7 +420,7 @@
 				return uigorgon.VALIDATION_INVALID_ELEMENT;
 			}
 		}
-		uigorgon.customValidations = {
+				uigorgon.customValidations = {
 			'single-line': function(val) { return val.match(/\r|\n/) === null; },
 			'numeric': function(val) { return val.match(/^-?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?$/) !== null; },
 			'integer': function(val) { return val.match(/^-?[0-9]+$/) !== null; },
@@ -670,6 +670,80 @@
 			}
 			return result;
 		};
+				uigorgon.clearForm = function (form)
+		{
+			var elements = form.elements;
+			for (var index = 0; index < elements.length; index++)
+			{
+				uigorgon.clearValue(elements[index]);
+			}
+		};
+		uigorgon.saveForm = function (form)
+		{
+			var data = {};
+			var elements = form.elements;
+			for (var index = 0; index < elements.length; index++)
+			{
+				var element = elements[index];
+				var value = uigorgon.getValue(element);
+				if (element.name in data)
+				{
+					data[element.name].push(value);
+				}
+				else
+				{
+					data[element.name] = [value];
+				}
+			}
+			return data;
+		};
+		uigorgon.loadForm = function (form, data)
+		{
+			var elements = form.elements;
+			var count = {};
+			for (var index = 0; index < elements.length; index++)
+			{
+				var element = elements[index];
+				if (element.name in data)
+				{
+					var subindex = 0;
+					if (element.name in count)
+					{
+						subindex = count[element.name];
+					}
+					else
+					{
+						count[element.name] = subindex;
+					}
+					uigorgon.setValue(element, data[element.name][subindex]);
+					count[element.name]++;
+				}
+			}
+		};
+	}
+)(window.uigorgon = (window.uigorgon || {}), window);
+
+( /* DOM manipulation */
+	function (uigorgon, window, undefined)
+	{
+		function _addEventListener(element, eventName, handler)
+		{
+			if ("addEventListener" in element)
+			{
+				element.addEventListener(eventName, handler);
+				return function(){element.removeEventListener(eventName, handler);};
+			}
+			else
+			{
+				eventName = 'on' + eventName;
+				var _handler = function(event)
+				{
+					handler.call(element, event);
+				};
+				element.attachEvent(eventName, _handler);
+				return function() { element.detachEvent('on' + eventName, _handler); };
+			}
+		}
 		uigorgon.getInheritableAttribute = function (element, attribute)
 		{
 			do
@@ -971,56 +1045,6 @@
 					}
 			}
 		};
-		uigorgon.clearForm = function (form)
-		{
-			var elements = form.elements;
-			for (var index = 0; index < elements.length; index++)
-			{
-				uigorgon.clearValue(elements[index]);
-			}
-		};
-		uigorgon.saveForm = function (form)
-		{
-			var data = {};
-			var elements = form.elements;
-			for (var index = 0; index < elements.length; index++)
-			{
-				var element = elements[index];
-				var value = uigorgon.getValue(element);
-				if (element.name in data)
-				{
-					data[element.name].push(value);
-				}
-				else
-				{
-					data[element.name] = [value];
-				}
-			}
-			return data;
-		};
-		uigorgon.loadForm = function (form, data)
-		{
-			var elements = form.elements;
-			var count = {};
-			for (var index = 0; index < elements.length; index++)
-			{
-				var element = elements[index];
-				if (element.name in data)
-				{
-					var subindex = 0;
-					if (element.name in count)
-					{
-						subindex = count[element.name];
-					}
-					else
-					{
-						count[element.name] = subindex;
-					}
-					uigorgon.setValue(element, data[element.name][subindex]);
-					count[element.name]++;
-				}
-			}
-		};
 		uigorgon.measure = function (element)
 		{
 			if (uigorgon.isElement(element))
@@ -1043,60 +1067,6 @@
 				return null;
 			}
 		};
-		
-		var _events = {};
-		
-		function _addEventListener(element, eventName, handler)
-		{
-			if ("addEventListener" in element)
-			{
-				element.addEventListener(eventName, handler);
-				return function(){element.removeEventListener(eventName, handler);};
-			}
-			else
-			{
-				eventName = 'on' + eventName;
-				var _handler = function(event)
-				{
-					handler.call(element, event);
-				};
-				element.attachEvent(eventName, _handler);
-				return function() { element.detachEvent('on' + eventName, _handler); };
-			}
-		}
-
-		uigorgon.addEventListener = function(eventName, handler)
-		{
-			if (!(eventName in _events))
-			{
-				_events[eventName] = [];
-			}
-			_events[eventName].push(handler);
-		};
-		
-		uigorgon.removeEventListener = function(eventName, handler)
-		{
-			if (eventName in _events)
-			{
-				_events[eventName].remove(handler);
-			}
-		};
-		
-		uigorgon.triggerEvent = function(eventName, event)
-		{
-			if (eventName in _events)
-			{
-				for (var index = 0; index < _events[eventName].length; index++)
-				{
-					var item = _events[eventName][index];
-					if ('call' in item)
-					{
-						item.call(uigorgon, event);
-					}
-				}
-			}
-		};
-		
 		uigorgon.on = function(element, events, handler)
 		{
 			if (typeof handler === 'function')
@@ -1121,7 +1091,6 @@
 				return null;
 			}
 		};
-		
 		uigorgon.ready = function(callback)
 		{
 			if (typeof callback === 'function')
@@ -1152,6 +1121,42 @@
 								}
 							}
 						);
+					}
+				}
+			}
+		};
+	}
+)(window.uigorgon = (window.uigorgon || {}), window);
+
+( /* Fake Events */
+	function (uigorgon, window, undefined)
+	{
+		var _events = {};
+		uigorgon.addEventListener = function(eventName, handler)
+		{
+			if (!(eventName in _events))
+			{
+				_events[eventName] = [];
+			}
+			_events[eventName].push(handler);
+		};
+		uigorgon.removeEventListener = function(eventName, handler)
+		{
+			if (eventName in _events)
+			{
+				_events[eventName].remove(handler);
+			}
+		};
+		uigorgon.triggerEvent = function(eventName, event)
+		{
+			if (eventName in _events)
+			{
+				for (var index = 0; index < _events[eventName].length; index++)
+				{
+					var item = _events[eventName][index];
+					if ('call' in item)
+					{
+						item.call(uigorgon, event);
 					}
 				}
 			}
