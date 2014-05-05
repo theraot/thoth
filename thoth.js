@@ -5,7 +5,7 @@
 (	/* strings */
 	function(thoth, window, undefined)
 	{
-		if (!("format" in String))
+		if (!('format' in String))
 		{
 			String.format = function(format)
 			{
@@ -21,7 +21,7 @@
 			};
 		}
 		
-		if (!("endsWith" in String.prototype))
+		if (!('endsWith' in String.prototype))
 		{
 			String.prototype.endsWith = function (searchString, position)
 			{
@@ -32,7 +32,7 @@
 			};
 		}
 		
-		if (!("startsWith" in String.prototype))
+		if (!('startsWith' in String.prototype))
 		{
 			String.prototype.startsWith = function (searchString, position)
 			{
@@ -41,7 +41,7 @@
 			};
 		}
 		
-		if (!("trim" in String.prototype))
+		if (!('trim' in String.prototype))
 		{
 			String.prototype.trim = function ()
 			{
@@ -54,7 +54,7 @@
 (	/* arrays */
 	function(thoth, window, undefined)
 	{
-		if (!("contains" in Array.prototype))
+		if (!('contains' in Array.prototype))
 		{
 			Array.prototype.contains = function (item)
 			{
@@ -71,11 +71,11 @@
 			};
 		}
 		
-		if (!("containsWhere" in Array.prototype))
+		if (!('containsWhere' in Array.prototype))
 		{
 			Array.prototype.containsWhere = function (predicate /*, thisArg*/)
 			{
-				if (typeof predicate !== "function")
+				if (typeof predicate !== 'function')
 				{
 					throw new TypeError();
 				}
@@ -93,11 +93,11 @@
 			};
 		}
 		
-		if (!("every" in Array.prototype))
+		if (!('every' in Array.prototype))
 		{
 			Array.prototype.every = function(callback /*, thisArg*/)
 			{
-				if (typeof callback !== "function")
+				if (typeof callback !== 'function')
 				{
 					throw new TypeError();
 				}
@@ -115,11 +115,11 @@
 			};
 		}
 		
-		if (!("filter" in Array.prototype))
+		if (!('filter' in Array.prototype))
 		{
 			Array.prototype.filter = function(callback /*, thisArg */)
 			{
-				if (typeof callback !== "function")
+				if (typeof callback !== 'function')
 				{
 					throw new TypeError();
 				}
@@ -142,11 +142,11 @@
 			};
 		}
 		
-		if (!("forEach" in Array.prototype))
+		if (!('forEach' in Array.prototype))
 		{
 			Array.prototype.forEach = function(callback /*, thisArg*/)
 			{
-				if (typeof callback !== "function")
+				if (typeof callback !== 'function')
 				{
 					throw new TypeError();
 				}
@@ -163,7 +163,7 @@
 			};
 		}
 		
-		if (!("indexOf" in Array.prototype))
+		if (!('indexOf' in Array.prototype))
 		{
 			Array.prototype.indexOf = function (item, fromIndex)
 			{
@@ -192,7 +192,7 @@
 			};
 		}
 		
-		if (!("isArray" in Array))
+		if (!('isArray' in Array))
 		{
 			Array.isArray = function(arg)
 			{
@@ -200,7 +200,7 @@
 			};
 		}
 		
-		if (!("remove" in Array.prototype))
+		if (!('remove' in Array.prototype))
 		{
 			Array.prototype.remove = function(item)
 			{
@@ -218,7 +218,7 @@
 			};
 		}
 		
-		if (!("removeAt" in Array.prototype))
+		if (!('removeAt' in Array.prototype))
 		{
 			Array.prototype.removeAt = function(key)
 			{
@@ -235,11 +235,11 @@
 			};
 		}
 		
-		if (!("removeWhere" in Array.prototype))
+		if (!('removeWhere' in Array.prototype))
 		{
 			Array.prototype.removeWhere = function(predicate /*, thisArg*/)
 			{
-				if (typeof predicate !== "function")
+				if (typeof predicate !== 'function')
 				{
 					throw new TypeError();
 				}
@@ -1833,7 +1833,7 @@
 (	/* include */
 	function(thoth, window, undefined)
 	{
-		var SEPARATOR = "/";
+		var SEPARATOR = '/';
 		var _root_urls = [];
 		var included_urls = [];
 		var loading = new thoth.Dispatch();
@@ -1844,13 +1844,13 @@
 		{
 			var result =  [];
 			var folder;
-			while (typeof (folder = folders.shift()) !== "undefined")
+			while (typeof (folder = folders.shift()) !== 'undefined')
 			{
-				if (folder === ".")
+				if (folder === '.')
 				{
 					continue;
 				}
-				if (folder === "..")
+				if (folder === '..')
 				{
 					result.pop();
 					continue;
@@ -1862,7 +1862,7 @@
 		
 		function _process_absolute_url(absolute)
 		{
-			if (typeof absolute !== "string")
+			if (typeof absolute !== 'string')
 			{
 				return [];
 			}
@@ -1879,9 +1879,9 @@
 		
 		function _process_relative_url(relative)
 		{
-			if (typeof relative !== "string")
+			if (typeof relative !== 'string')
 			{
-				return ["."];
+				return ['.'];
 			}
 			else
 			{
@@ -1889,9 +1889,9 @@
 				{
 					relative = relative.substr(SEPARATOR.length);
 				}
-				if (relative === "")
+				if (relative === '')
 				{
-					return ["."];
+					return ['.'];
 				}
 				else
 				{
@@ -1903,8 +1903,8 @@
 		
 		function _resolve_url(url, callback)
 		{
-			var check = url.indexOf("/");
-			if (check !== -1 && check === url.indexOf("//"))
+			var check = url.indexOf('/');
+			if (check !== -1 && check === url.indexOf('//'))
 			{
 				//take as absolute or protocol relative
 				callback(url);
@@ -1948,17 +1948,17 @@
 		function _include(url, callback, once)
 		{
 			var document = window.document;
-			var head = document.getElementsByTagName("head")[0] || document.documentElement;
+			var head = document.getElementsByTagName('head')[0] || document.documentElement;
 			var script = document.createElement('script');
 			var done = false;
 			if (typeof callback === 'function')
 			{
 				script.onload = script.onreadystatechange = function()
 				{
-					if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "interactive" || this.readyState === "complete"))
+					if (!done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'interactive' || this.readyState === 'complete'))
 					{
 						done = true;
-						var data = this.getAttribute("data-src");
+						var data = this.getAttribute('data-src');
 						loading.go(data);
 						loading.remove(data);
 						this.onload = this.onreadystatechange = null;
@@ -1998,10 +1998,10 @@
 						}
 						if (insert)
 						{
-							script.type = "text/javascript";
+							script.type = 'text/javascript';
 							script.async = true;
 							script.src = resolved_url;
-							script.setAttribute("data-src", resolved_url);
+							script.setAttribute('data-src', resolved_url);
 							loading.add(resolved_url, callback);
 							head.insertBefore(script, head.firstChild);
 						}
