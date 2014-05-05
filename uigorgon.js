@@ -728,7 +728,7 @@
 	{
 		function _addEventListener(element, eventName, handler)
 		{
-			if ("addEventListener" in element)
+			if ('addEventListener' in element)
 			{
 				element.addEventListener(eventName, handler);
 				return function(){element.removeEventListener(eventName, handler);};
@@ -1041,7 +1041,7 @@
 				default:
 					if ('value' in element)
 					{
-						element.value = "";
+						element.value = '';
 					}
 			}
 		};
@@ -1101,7 +1101,7 @@
 				}
 				else
 				{
-					if ("addEventListener" in window.document)
+					if ('addEventListener' in window.document)
 					{
 						window.document.addEventListener('DOMContentLoaded', callback);
 					}
