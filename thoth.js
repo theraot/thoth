@@ -1342,7 +1342,7 @@
 			};
 			thoth.on(form, 'submit', submitHandler);
 		};
-		thoth.findField = function (form, type)
+		thoth.findFieldsByType = function (form, type)
 		{
 			var result = [];
 			var elements = form.elements;
@@ -1350,6 +1350,20 @@
 			{
 				var item = elements[index];
 				if (thoth.getType(item) === type)
+				{
+					result.push(item);
+				}
+			}
+			return result;
+		};
+		thoth.findFieldsByName = function (form, name)
+		{
+			var result = [];
+			var elements = form.elements;
+			for (var index = elements.length; index--;)
+			{
+				var item = elements[index];
+				if (item.anme === name)
 				{
 					result.push(item);
 				}
