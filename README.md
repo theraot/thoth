@@ -9,6 +9,7 @@ This library includes polyfills for:
 
 - Array manipualtion
 	- indexOf (polyfill ECMA 5.1)
+	- lastIndexOf (polyfill ECMA 5.1)
 	- forEach (polyfill ECMA 5.1)
 	- filter (polyfill ECMA 5.1)
 	- every (polyfill ECMA 5.1)
