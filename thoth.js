@@ -1088,13 +1088,32 @@
 				{
 					if (thoth.hasAttribute(field, 'data-validate'))
 					{
-						var customValidation = field.getAttribute('data-validate');
-						var customValidationParameter = field.getAttribute('data-validate-parameter');
-						if (customValidation in thoth.customValidations)
+						var customValidation = field.getAttribute('data-validate').split(/\s/);
+						for (var validationIndex = 0; validationIndex < customValidation.length; validationIndex++)
 						{
-							if (!thoth.customValidations[customValidation](value, customValidationParameter))
+							var data = customValidation[validationIndex].match(/^([^\(]+)(?:\(([^\)]*)\))?$/);
+							if (data[1] in thoth.customValidations)
 							{
-								return result.value = thoth.VALIDATION_CUSTOM_FAILURE;
+								if ((data[2].startsWith('"') && data[2].endssWith('"')) || (data[2].startsWith('\'') && data[2].endssWith('\'')))
+								{
+									data[2] = data[2].substr(1, data[2].length - 1);
+								}
+								else if (data[2].startsWith('&'))
+								{
+									var fields = thoth.findFieldsByName(data[2]);
+									if (fields.length > 0)
+									{
+										data[2] = thoth.getValue(fields[0]);
+									}
+									else
+									{
+										data[2] = undefined;
+									}
+								}
+								if (!thoth.customValidations[data[1]](value, data[2]))
+								{
+									return result.value = thoth.VALIDATION_CUSTOM_FAILURE;
+								}
 							}
 						}
 					}
