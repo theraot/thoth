@@ -734,7 +734,7 @@
 	}
 )(window.thoth = (window.thoth || {}), window);
 
-( /* Form validation */
+( /* Form validation & Events */
 	function (thoth, window, undefined)
 	{
 		thoth.VALIDATION_INVALID_ELEMENT = -1;
@@ -1546,12 +1546,7 @@
 				}
 			}
 		};
-	}
-)(window.thoth = (window.thoth || {}), window);
-
-( /* Fake Events */
-	function (thoth, window, undefined)
-	{
+		//----
 		var _events = {};
 		thoth.addEventListener = function(eventName, handler)
 		{
