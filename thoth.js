@@ -134,7 +134,7 @@
 						var current = array[index];
 						if (callback.call(thisArg, current, index, array))
 						{
-							result[result.length] = current;
+							result.push(current);
 						}
 					}
 				}
@@ -532,12 +532,13 @@
 					return element.options[element.selectedIndex];
 				case 'select-multiple':
 					var result = [];
-					for(var index = 0; index < element.options.length; index++)
+					var index = element.options.length;
+					while (index--)
 					{
 						var option = element.options[index];
 						if (option.selected)
 						{
-							result.push(option.value);
+							result.unshift(option.value);
 						}
 					}
 					return result;
@@ -590,11 +591,11 @@
 					element.checked = value;
 				case 'select-one':
 				case 'select-multiple':
-					var index = 0;
+					var index = element.options.length;
 					var option;
 					if (typeof value === 'string')
 					{
-						for(; index < element.options.length; index++)
+						while (index--)
 						{
 							option = element.options[index];
 							if (option.value === value)
@@ -606,7 +607,7 @@
 					}
 					else
 					{
-						for(; index < element.options.length; index++)
+						while (index--)
 						{
 							option = element.options[index];
 							if (value.indexOf(option.value) !==-1)
@@ -679,10 +680,10 @@
 				if (Array.isArray(events))
 				{
 					var result = [];
-					var index = 0;
-					for (; index < events.length; index++)
+					var index = events.length;
+					while (index--)
 					{
-						result.push(_addEventListener(element, events[index], handler));
+						result.unshift(_addEventListener(element, events[index], handler));
 					}
 					return result;
 				}
@@ -973,13 +974,13 @@
 						{
 							if (form != null)
 							{
-								var index = 0;
+								var index = form.elements.length;
 								//Discover group
 								if (validator !== null)
 								{
 									var required = false;
 									var missing = true;
-									for (; index < form.elements.length; index++)
+									while (index--)
 									{
 										if (form.elements[index].getAttribute('name') === name && thoth.getType(form.elements[index]) === type)
 										{
@@ -1004,7 +1005,7 @@
 								}
 								else
 								{
-									for (; index < form.elements.length; index++)
+									while (index--)
 									{
 										if (form.elements[index].getAttribute('name') === name && thoth.getType(form.elements[index]) === type)
 										{
@@ -1134,7 +1135,8 @@
 					if (thoth.hasAttribute(field, 'data-validate'))
 					{
 						var customValidation = field.getAttribute('data-validate').split(/\s/);
-						for (var validationIndex = 0; validationIndex < customValidation.length; validationIndex++)
+						var validationIndex = customValidation.length;
+						while (validationIndex--)
 						{
 							var data = customValidation[validationIndex].match(/^([^\(]+)(?:\(([^\)]*)\))?$/);
 							if (data[1] in thoth.customValidations)
@@ -1257,7 +1259,8 @@
 						{
 							var emails = val.split(',');
 							var email_validation = thoth.typeValidations['email-one'];
-							for (var index = 0; index < emails.length; index++)
+							var index = emails.length;
+							while (index--)
 							{
 								if (!email_validation(emails[index]))
 								{
@@ -1356,7 +1359,8 @@
 			this.addSanitation = function(type, sanitation)
 			{
 				var elements = form.elements;
-				for (var index = 0; index < elements.length; index++)
+				var index = elements.length;
+				while (index--)
 				{
 					if (thoth.getType(elements[index]) === type)
 					{
@@ -1368,7 +1372,8 @@
 			this.apply = function(type, callback)
 			{
 				var elements = form.elements;
-				for (var index = 0; index < elements.length; index++)
+				var index = elements.length;
+				while (index--)
 				{
 					if (thoth.getType(elements[index]) === type)
 					{
@@ -1381,7 +1386,8 @@
 				var errors = [];
 				revision++;
 				var elements = form.elements;
-				for (var index = 0; index < elements.length; index++)
+				var index = elements.length;
+				while (index--)
 				{
 					if (!('validation' in elements[index]) || elements[index].validation.revision != revision)
 					{
@@ -1392,7 +1398,7 @@
 					{
 						thoth.addClass(elements[index], this.invalidClass);
 						thoth.removeClass(elements[index], this.validClass);
-						errors.push({element: elements[index], result: result});
+						errors.unshift({element: elements[index], result: result});
 					}
 					else if (result === 0)
 					{
@@ -1402,7 +1408,9 @@
 				}
 				return errors;
 			};
-			var submitHandler = function(event) {
+			var submitHandler = function(event)
+			{
+				event = event || {};
 				event.errors = _this.validateForm();
 				var go = true;
 				if ('stopImmediatePropagation' in event)
@@ -1427,7 +1435,7 @@
 				}
 				else
 				{
-					if (event && 'preventDefault' in event)
+					if ('preventDefault' in event)
 					{
 						event.preventDefault();
 						return undefined;
@@ -1459,12 +1467,13 @@
 		{
 			var result = [];
 			var elements = form.elements;
-			for (var index = elements.length; index--;)
+			var index = elements.length;
+			while (index--)
 			{
 				var item = elements[index];
 				if (thoth.getType(item) === type)
 				{
-					result.push(item);
+					result.unshift(item);
 				}
 			}
 			return result;
@@ -1473,12 +1482,13 @@
 		{
 			var result = [];
 			var elements = form.elements;
-			for (var index = elements.length; index--;)
+			var index = elements.length;
+			while (index--)
 			{
 				var item = elements[index];
-				if (item.anme === name)
+				if (item.name === name)
 				{
-					result.push(item);
+					result.unshift(item);
 				}
 			}
 			return result;
@@ -1486,7 +1496,8 @@
 		thoth.clearForm = function (form)
 		{
 			var elements = form.elements;
-			for (var index = 0; index < elements.length; index++)
+			var index = elements.length;
+			while (index--)
 			{
 				thoth.clearValue(elements[index]);
 			}
@@ -1495,7 +1506,8 @@
 		{
 			var data = {};
 			var elements = form.elements;
-			for (var index = 0; index < elements.length; index++)
+			var index = elements.length;
+			while (index--)
 			{
 				var element = elements[index];
 				var value = thoth.getValue(element);
@@ -1514,7 +1526,8 @@
 		{
 			var elements = form.elements;
 			var count = {};
-			for (var index = 0; index < elements.length; index++)
+			var index = elements.length;
+			while (index--)
 			{
 				var element = elements[index];
 				if (element.name in data)
@@ -1610,9 +1623,9 @@
 		
 		function _run_delayed(id)
 		{
-			var count = delayed_operations.length;
 			var delayed_operation;
-			for (var index = 0; index < count; index++)
+			var index = delayed_operations.length;
+			while (index--)
 			{
 				delayed_operation = delayed_operations[index];
 				if (delayed_operation.id === id)
@@ -1691,9 +1704,9 @@
 		
 		thoth.stop = function (id)
 		{
-			var count = delayed_operations.length;
 			var delayed_operation;
-			for (var index = 0; index < count; index++)
+			var index = delayed_operations.length;
+			while (index--)
 			{
 				delayed_operation = delayed_operations[index];
 				if (delayed_operation.id === id)
@@ -1710,9 +1723,9 @@
 		
 		thoth.isRunning = function (id)
 		{
-			var count = delayed_operations.length;
 			var delayed_operation;
-			for (var index = 0; index < count; index++)
+			var index = delayed_operations.length;
+			while (index--)
 			{
 				delayed_operation = delayed_operations[index];
 				if (delayed_operation.id === id)
