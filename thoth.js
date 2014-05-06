@@ -1412,23 +1412,7 @@
 			{
 				event = event || {};
 				event.errors = _this.validateForm();
-				var go = true;
-				if ('stopImmediatePropagation' in event)
-				{
-					event.stopImmediatePropagation = function()
-					{
-						go = false;
-						event.stopImmediatePropagation();
-					};
-				}
-				else
-				{
-					event.stopImmediatePropagation = function()
-					{
-						go = false;
-					};
-				}
-				thoth.invokeEx(_this.callbacks, function() { return go; }, _this, event);
+				_triggerEvent(_this.callbacks, event);
 				if (!Array.isArray(event.errors) || event.errors.length === 0)
 				{
 					return true;
@@ -1548,6 +1532,26 @@
 		};
 		//----
 		var _events = {};
+		function _triggerEvent(handlers, event)
+		{
+			var go = true;
+			if ('stopImmediatePropagation' in event)
+			{
+				event.stopImmediatePropagation = function()
+				{
+					go = false;
+					event.stopImmediatePropagation();
+				};
+			}
+			else
+			{
+				event.stopImmediatePropagation = function()
+				{
+					go = false;
+				};
+			}
+			thoth.invokeEx(handlers, function() { return go; }, thoth, event);
+		}
 		thoth.addEventListener = function(eventName, handler)
 		{
 			if (!(eventName in _events))
@@ -1567,23 +1571,8 @@
 		{
 			if (eventName in _events)
 			{
-				var go = true;
-				if ('stopImmediatePropagation' in event)
-				{
-					event.stopImmediatePropagation = function()
-					{
-						go = false;
-						event.stopImmediatePropagation();
-					};
-				}
-				else
-				{
-					event.stopImmediatePropagation = function()
-					{
-						go = false;
-					};
-				}
-				thoth.invokeEx(_events[eventName], function() { return go; }, thoth, event);
+				event = event || {};
+				_triggerEvent(_events[eventName], event);
 			}
 			return event.returnValue;
 		};
