@@ -1316,7 +1316,7 @@
 		{
 			var revision = 0;
 			var _this = this;
-			this.callback = function () { };
+			this.callbacks = [];
 			this.fields = [];
 			this.form = findForm(form);
 			this.validClass = '';
@@ -1379,9 +1379,9 @@
 				return errors;
 			};
 			var submitHandler = function(event) {
-				var errors = _this.validateForm();
-				_this.callback.call(_this, errors, event);
-				if (errors.length === 0)
+				event.errors = _this.validateForm();
+				thoth.invoke(_this.callbacks, _this, event);
+				if (!Array.isArray(event.errors) || event.errors.length === 0)
 				{
 					return true;
 				}
@@ -1400,6 +1400,20 @@
 				}
 			};
 			thoth.on(form, 'submit', submitHandler);
+			this.addEventListener = function(eventName, handler)
+			{
+				if (eventName === 'submit')
+				{
+					this.callbacks.push(handler);
+				}
+			};
+			this.removeEventListener = function(eventName, handler)
+			{
+				if (eventName === 'submit')
+				{
+					this.callbacks.remove(handler);
+				}
+			};
 		};
 		thoth.findFieldsByType = function (form, type)
 		{
