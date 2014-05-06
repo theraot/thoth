@@ -731,20 +731,6 @@
 			'email-multiple',
 			'password'
 		];
-		function findForm(form)
-		{
-			if (typeof form === 'string')
-			{
-				return window.document.forms[form];
-			} else {
-				if (thoth.isElement(form))
-				{
-					return form;
-				} else {
-					return null;
-				}
-			}
-		}
 		function processDate(value, type) {
 			var parts = null;
 			var success = false;
@@ -1210,6 +1196,20 @@
 			'datetime-local': function(val) { return processDate(val, 'datetime-local') !== null; },
 			'time': function(val) { return processDate(val, 'time') !== null; },
 		};
+		thoth.findFormByName = function(form)
+		{
+			if (typeof form === 'string')
+			{
+				return window.document.forms[form];
+			} else {
+				if (thoth.isElement(form))
+				{
+					return form;
+				} else {
+					return null;
+				}
+			}
+		};
 		thoth.parseDate = function(value, type)
 		{
 			var data = processDate(value, type);
@@ -1277,7 +1277,7 @@
 			this.validatedHandlers = [];
 			this.submitHandlers = [];
 			this.fields = [];
-			this.form = findForm(form);
+			this.form = thoth.findFormByName(form);
 			this.validClass = '';
 			this.invalidClass = '';
 			this.getRevision = function ()
