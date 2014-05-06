@@ -59,8 +59,8 @@
 			Array.prototype.contains = function (item)
 			{
 				var array = Object(this);
-				var count = array.length >>> 0;
-				for (var index = 0; index < count; index++)
+				var index = array.length >>> 0;
+				while(index--)
 				{
 					if (index in array && array[index] === item)
 					{
