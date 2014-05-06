@@ -174,18 +174,48 @@
 				{
 					if (fromIndex < 0)
 					{
-						fromIndex += length;
+						fromIndex += count;
 						if (fromIndex < 0)
 						{
 							fromIndex = 0;
 						}
 					}
-					for (var index = fromIndex; index < count; index++)
+					for (; fromIndex < count; fromIndex++)
 					{
-						if (index in array && array[index] === item)
+						if (fromIndex in array && array[fromIndex] === item)
 						{
-							return index;
+							return fromIndex;
 						}
+					}
+				}
+				return -1;
+			};
+		}
+
+		if (!('lastIndexOf' in Array.prototype))
+		{
+			Array.prototype.lastIndexOf = function (item, fromIndex)
+			{
+				var array = Object(this);
+				var count = array.length >>> 0;
+				fromIndex = +fromIndex || count;
+				if (fromIndex > count)
+				{
+					fromIndex = count;
+				}
+				if (fromIndex < 0)
+				{
+					fromIndex += count;
+					if (fromIndex < 0)
+					{
+						return -1;
+					}
+				}
+				while(fromIndex--)
+				{
+					if (fromIndex in array && array[fromIndex] === item)
+					{
+						return fromIndex;
 					}
 				}
 				return -1;
