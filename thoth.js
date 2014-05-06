@@ -261,6 +261,27 @@
 				}
 				return result;
 			};
+
+			thoth.invoke = function(callbacks /*, thisArg, args...*/)
+			{
+				var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+				var args = Array.prototype.slice.call(arguments, 2, arguments.length);
+				if (typeof callbacks === 'function')
+				{
+					callbacks.apply(thisArg, args);
+				}
+				else
+				{
+					var count = callbacks.length >>> 0;
+					for (var index = 0; index < count; index++)
+					{
+						if (index in callbacks)
+						{
+							callbacks[index].apply(thisArg, args);
+						}
+					}
+				}
+			};
 		}
 	}
 )(window.thoth = (window.thoth || {}), window);
@@ -1484,14 +1505,7 @@
 		{
 			if (eventName in _events)
 			{
-				for (var index = 0; index < _events[eventName].length; index++)
-				{
-					var item = _events[eventName][index];
-					if ('call' in item)
-					{
-						item.call(thoth, event);
-					}
-				}
+				thoth.invoke(_events[eventName], thoth, event);
 			}
 		};
 	}
