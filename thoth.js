@@ -1343,7 +1343,8 @@
 		{
 			var revision = 0;
 			var _this = this;
-			this.callbacks = [];
+			this.validatedHandlers = [];
+			this.submitHandlers = [];
 			this.fields = [];
 			this.form = findForm(form);
 			this.validClass = '';
@@ -1411,8 +1412,9 @@
 			var submitHandler = function(event)
 			{
 				event = event || {};
+				_triggerEvent(_this.submitHandlers, event);
 				event.errors = _this.validateForm();
-				_triggerEvent(_this.callbacks, event);
+				_triggerEvent(_this.validatedHandlers, event);
 				if (!Array.isArray(event.errors) || event.errors.length === 0)
 				{
 					return true;
@@ -1436,14 +1438,22 @@
 			{
 				if (eventName === 'submit')
 				{
-					this.callbacks.push(handler);
+					this.submitHandlers.push(handler);
+				}
+				else if (eventName === 'validated')
+				{
+					this.validatedHandlers.push(handler);
 				}
 			};
 			this.removeEventListener = function(eventName, handler)
 			{
 				if (eventName === 'submit')
 				{
-					this.callbacks.remove(handler);
+					this.submitHandlers.remove(handler);
+				}
+				else if (eventName === 'validated')
+				{
+					this.validatedHandlers.remove(handler);
 				}
 			};
 		};
