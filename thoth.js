@@ -457,6 +457,24 @@
 				return false;
 			}
 		};
+		thoth.getClasses = function(element, className)
+		{
+			if (thoth.isElement(element) && typeof className === 'string' && className != '')
+			{
+				if ('classList' in element)
+				{
+					return element.classList;
+				}
+				else
+				{
+					return element.className.split(/\s/);
+				}
+			}
+			else
+			{
+				return null;
+			}
+		};
 		thoth.getValue = function(element)
 		{
 			var field_type = element.type.toLowerCase();
