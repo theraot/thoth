@@ -227,9 +227,7 @@
 				{
 					Array.prototype.splice.call(this, key, 1);
 					return true;
-				}
-				else
-				{
+				} else {
 					return false;
 				}
 			};
@@ -253,9 +251,7 @@
 					{
 						Array.prototype.splice.call(this, index, 1);
 						result++;
-					}
-					else
-					{
+					} else {
 						index++;
 					}
 				}
@@ -269,9 +265,7 @@
 				if (typeof callbacks === 'function')
 				{
 					callbacks.apply(thisArg, args);
-				}
-				else
-				{
+				} else {
 					var count = callbacks.length >>> 0;
 					for (var index = 0; index < count; index++)
 					{
@@ -290,9 +284,7 @@
 				if (typeof callbacks === 'function')
 				{
 					decisionCallback.call(thisArg, callbacks.apply(thisArg, args), -1);
-				}
-				else
-				{
+				} else {
 					var count = callbacks.length >>> 0;
 					for (var index = 0; index < count; index++)
 					{
@@ -319,9 +311,7 @@
 			{
 				element.addEventListener(eventName, handler);
 				return function(){element.removeEventListener(eventName, handler);};
-			}
-			else
-			{
+			} else {
 				eventName = 'on' + eventName;
 				var _handler = function(event)
 				{
@@ -333,8 +323,7 @@
 		}
 		thoth.getInheritableAttribute = function (element, attribute)
 		{
-			do
-			{
+			do {
 				if (typeof element === 'undefined' || element === null)
 				{
 					return undefined;
@@ -342,15 +331,11 @@
 				else if (!thoth.isElement(element))
 				{
 					element = element.parentNode;
-				}
-				else
-				{
+				} else {
 					if (thoth.hasAttribute(element, attribute))
 					{
 						return element.getAttribute(attribute);
-					}
-					else
-					{
+					} else {
 						element = element.parentNode;
 					}
 				}
@@ -361,17 +346,14 @@
 			if ('hasAttribute' in element)
 			{
 				return element.hasAttribute(attribute);
-			}
-			else
-			{
+			} else {
 				return typeof element.getAttribute(attribute) === 'string' && typeof element[attribute] !== 'undefined';
 			}
 		};
 		thoth.findParent = function (element, tagName)
 		{
 			tagName = tagName.toLowerCase();
-			do
-			{
+			do {
 				if (typeof element === 'undefined' || element === null)
 				{
 					return null;
@@ -379,15 +361,11 @@
 				else if (!thoth.isElement(element))
 				{
 					element = element.parentNode;
-				}
-				else
-				{
+				} else {
 					if (element.tagName.toLowerCase() === tagName)
 					{
 						return element;
-					}
-					else
-					{
+					} else {
 						element = element.parentNode;
 					}
 				}
@@ -398,16 +376,13 @@
 			if (typeof window.HTMLElement === 'object')
 			{
 				return node instanceof window.HTMLElement;
-			}
-			else
-			{
+			} else {
 				return typeof node === 'object' && node !== null && node.nodeType === 1;
 			}
 		};
 		thoth.isNested = function (element, nest)
 		{
-			do
-			{
+			do {
 				if (!thoth.isElement(element))
 				{
 					return false;
@@ -415,9 +390,7 @@
 				else if (element === nest)
 				{
 					return true;
-				}
-				else
-				{
+				} else {
 					element = element.parentNode;
 				}
 			} while (true);
@@ -427,11 +400,8 @@
 			if ('nextElementSibling' in element)
 			{
 				return element.previousElementSibling;
-			}
-			else
-			{
-				do
-				{
+			} else {
+				do {
 					element = element.previousSibling;
 				} while (!thoth.isElement(element));
 				return element;
@@ -442,11 +412,8 @@
 			if ('nextElementSibling' in element)
 			{
 				return element.nextElementSibling;
-			}
-			else
-			{
-				do
-				{
+			} else {
+				do {
 					element = element.nextSibling;
 				} while (!thoth.isElement(element));
 				return element;
@@ -459,9 +426,7 @@
 				if ('classList' in element)
 				{
 					element.classList.add(className);
-				}
-				else
-				{
+				} else {
 					if (!element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)')))
 					{
 						element.className += ' ' + className;
@@ -476,9 +441,7 @@
 				if ('classList' in element)
 				{
 					element.classList.remove(className);
-				}
-				else
-				{
+				} else {
 					var pattern = new RegExp('(\\s|^)'+className+'(\\s|$)');
 					element.className = element.className.replace(pattern, ' ');
 				}
@@ -491,14 +454,10 @@
 				if ('classList' in element)
 				{
 					return element.classList.contains(className);
-				}
-				else
-				{
+				} else {
 					return element.className.match(new RegExp('(\\s|^)'+className+'(\\s|$)'));
 				}
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 		};
@@ -509,14 +468,10 @@
 				if ('classList' in element)
 				{
 					return element.classList;
-				}
-				else
-				{
+				} else {
 					return element.className.split(/\s/);
 				}
-			}
-			else
-			{
+			} else {
 				return null;
 			}
 		};
@@ -551,9 +506,7 @@
 					if ('value' in element)
 					{
 						return element.value;
-					}
-					else
-					{
+					} else {
 						return undefined;
 					}
 			}
@@ -570,14 +523,10 @@
 				if (thoth.hasAttribute(element, 'multiple'))
 				{
 					return 'email-multiple';
-				}
-				else
-				{
+				} else {
 					return 'email-one';
 				}
-			}
-			else
-			{
+			} else {
 				return field_type;
 			}
 		};
@@ -604,9 +553,7 @@
 								break;
 							}
 						}
-					}
-					else
-					{
+					} else {
 						while (index--)
 						{
 							option = element.options[index];
@@ -660,16 +607,13 @@
 				result.top = 0;
 				result.width = element.offsetWidth;
 				result.height = element.offsetHeight;
-				do
-				{
+				do {
 					result.left += element.offsetLeft;
 					result.top += element.offsetTop;
 					element = element.offsetParent;
 				} while (thoth.isElement(element))
 				return result;
-			}
-			else
-			{
+			} else {
 				return null;
 			}
 		};
@@ -686,14 +630,10 @@
 						result.unshift(_addEventListener(element, events[index], handler));
 					}
 					return result;
-				}
-				else
-				{
+				} else {
 					return _addEventListener(element, events, handler);
 				}
-			}
-			else
-			{
+			} else {
 				return null;
 			}
 		};
@@ -704,15 +644,11 @@
 				if (window.document.readyState === 'loaded' || window.document.readyState === 'interactive' || window.document.readyState === 'complete')
 				{
 					callback();
-				}
-				else
-				{
+				} else {
 					if ('addEventListener' in window.document)
 					{
 						window.document.addEventListener('DOMContentLoaded', callback);
-					}
-					else
-					{
+					} else {
 						window.document.attachEvent (
 							'onreadystatechange',
 							function()
@@ -757,8 +693,7 @@
 			207, 212, 218, 224, 229, 235, 240, 246, 252,
 			257, 263, 268, 274, 280, 285, 291, 296, 303,
 			308, 314, 320, 325, 331, 336, 342, 348, 353,
-			359, 364, 370, 376, 381, 387, 392, 398
-		];
+			359, 364, 370, 376, 381, 387, 392, 398];
 		var types_literal = [
 			'text',
 			'search',
@@ -771,15 +706,11 @@
 			if (typeof form === 'string')
 			{
 				return window.document.forms[form];
-			}
-			else
-			{
+			} else {
 				if (thoth.isElement(form))
 				{
 					return form;
-				}
-				else
-				{
+				} else {
 					return null;
 				}
 			}
@@ -825,18 +756,14 @@
 								if (months === 2)
 								{
 									success = years % 400 === 0 || (years % 4 === 0 && years % 100 === 0);
-								}
-								else
-								{
+								} else {
 									success = true;
 								}
 							}
 							else if (steps === 30)
 							{
 								success = months !== 2;
-							}
-							else
-							{
+							} else {
 								success = months_31.indexOf(months) !== -1;
 							}
 						}
@@ -854,9 +781,7 @@
 							if (steps <= 53)
 							{
 								return true;
-							}
-							else
-							{
+							} else {
 								return years_53.indexOf(years % 400) !== -1;
 							}
 						}
@@ -914,9 +839,7 @@
 			if (success)
 			{
 				return parts;
-			}
-			else
-			{
+			} else {
 				return null;
 			}
 		}
@@ -936,7 +859,7 @@
 				var type = thoth.getType(field);
 				if (type === 'hidden' || type === 'image' || type === 'submit' || type === 'reset' || type === 'button')
 				{
-					//Not validable
+					// Not validable //
 					return result.value = thoth.VALIDATION_NOT_VALIDABLE;
 				}
 				else if (type === 'select-one')
@@ -948,10 +871,8 @@
 				}
 				else if (type === 'select-multiple')
 				{
-					//Empty
-				}
-				else
-				{
+					// Empty //
+				} else {
 					var value = thoth.getValue(field);
 					if ('validation' in field)
 					{
@@ -975,7 +896,7 @@
 							if (form != null)
 							{
 								var index = form.elements.length;
-								//Discover group
+								// Discover group //
 								if (validator !== null)
 								{
 									var required = false;
@@ -1002,9 +923,7 @@
 									{
 										return result.value = thoth.VALIDATION_MISSING;
 									}
-								}
-								else
-								{
+								} else {
 									while (index--)
 									{
 										if (form.elements[index].getAttribute('name') === name && thoth.getType(form.elements[index]) === type)
@@ -1020,9 +939,7 @@
 										}
 									}
 								}
-							}
-							else
-							{
+							} else {
 								if (thoth.getValue(form.elements[index]) !== true && thoth.hasAttribute(field, 'required'))
 								{
 									return result.value = thoth.VALIDATION_MISSING;
@@ -1036,9 +953,7 @@
 						{
 							return result.value = thoth.VALIDATION_MISSING;
 						}
-					}
-					else
-					{
+					} else {
 						/*How to validate MIMETYPE of file?*/
 						if (typeof value !== 'string' || value === '')
 						{
@@ -1046,9 +961,7 @@
 							{
 								return result.value = thoth.VALIDATION_MISSING;
 							}
-						}
-						else
-						{
+						} else {
 							if (type in thoth.typeValidations)
 							{
 								var typevalidation = thoth.typeValidations[type];
@@ -1075,9 +988,7 @@
 										return result.value = thoth.VALIDATION_TOO_LONG;
 									}
 								}
-							}
-							else
-							{
+							} else {
 								if (type == 'range' || type == 'number')
 								{
 									if (thoth.hasAttribute(field, 'max'))
@@ -1122,7 +1033,7 @@
 										}
 										/*else if (thoth.hasAttribute(field, 'step'))
 										{
-											//NOT IMPLEMENTED
+											// NOT IMPLEMENTED //
 										}*/
 									}
 								}
@@ -1146,9 +1057,7 @@
 									if ((data[2].charAt(0) === '"' && data[2].endssWith('"')) || (data[2].charAt(0) === '\'' && data[2].endssWith('\'')))
 									{
 										data[2] = data[2].substr(1, data[2].length - 1);
-									}
-									else
-									{
+									} else {
 										var fields = null;
 										var _param = data[2].substr(1);
 										if (data[2].charAt(0) === '&')
@@ -1168,9 +1077,7 @@
 											if (fields.length > 0)
 											{
 												data[2] = thoth.getValue(fields[0]);
-											}
-											else
-											{
+											} else {
 												data[2] = undefined;
 											}
 										}
@@ -1185,9 +1092,7 @@
 					}
 				}
 				return result.value = thoth.VALIDATION_VALID;
-			}
-			else
-			{
+			} else {
 				return thoth.VALIDATION_INVALID_ELEMENT;
 			}
 		}
@@ -1228,16 +1133,14 @@
 							var password = '(?:' + url_unit_r + '*(?:\\:(?:' + url_unit_r + '*))?)';
 							var userinfo = '(?:' + username + '(?:@' + password + ')?@)?';
 							var port = '(?:\\:[0-9]*)?';
-							var path = '(?:/' + url_unit_s + '+(?:/' + url_unit_s + '+)*)?'; //not allowing empty path segments
+							var path = '(?:/' + url_unit_s + '+(?:/' + url_unit_s + '+)*)?'; // not allowing empty path segments //
 							var query = '(?:\\\?(?:' + url_unit + '*))?';
 							var regex = '^' + schema + '\\://' + userinfo + '([^:/]+)' + port + path + query +'$';
 							var matches = val.match(regex);
 							if (matches === null)
 							{
 								return false;
-							}
-							else
-							{
+							} else {
 								var domain = matches[1];
 								return thoth.customValidations['domain'](domain);
 							}
@@ -1248,9 +1151,7 @@
 							if (matches === null)
 							{
 								return false;
-							}
-							else
-							{
+							} else {
 								var domain = matches[1];
 								return thoth.customValidations['domain'](domain);
 							}
@@ -1418,16 +1319,12 @@
 				if (!Array.isArray(event.errors) || event.errors.length === 0)
 				{
 					return true;
-				}
-				else
-				{
+				} else {
 					if ('preventDefault' in event)
 					{
 						event.preventDefault();
 						return undefined;
-					}
-					else
-					{
+					} else {
 						event.returnValue = false;
 						return false;
 					}
@@ -1508,9 +1405,7 @@
 				if (element.name in data)
 				{
 					data[element.name].push(value);
-				}
-				else
-				{
+				} else {
 					data[element.name] = [value];
 				}
 			}
@@ -1530,9 +1425,7 @@
 					if (element.name in count)
 					{
 						subindex = count[element.name];
-					}
-					else
-					{
+					} else {
 						count[element.name] = subindex;
 					}
 					thoth.setValue(element, data[element.name][subindex]);
@@ -1552,9 +1445,7 @@
 					go = false;
 					event.stopImmediatePropagation();
 				};
-			}
-			else
-			{
+			} else {
 				event.stopImmediatePropagation = function()
 				{
 					go = false;
@@ -1638,9 +1529,7 @@
 					{
 						var timeout_id = window.setTimeout(function(){_run_delayed(id);}, delayed_operation.delay);
 						delayed_operation.timeout_id = timeout_id;
-					}
-					else
-					{
+					} else {
 						if (delayed_operation.done !== null)
 						{
 							delayed_operation.done();
@@ -1668,18 +1557,14 @@
 			else if (typeof repeat !== 'undefined' && repeat)
 			{
 				_repeat = true;
-			}
-			else
-			{
+			} else {
 				_repeat = false;
 			}
 			var _done;
 			if (typeof done === 'function')
 			{
 				_done = done;
-			}
-			else
-			{
+			} else {
 				_done = null;
 			}
 		    var delayed_operation =
@@ -1688,8 +1573,7 @@
 		        id: id,
 		        delay: delay,
 		        done: _done,
-		        repeat: _repeat
-		    };
+		        repeat: _repeat };
 			delayed_operations.push(delayed_operation);
 			var timeout_id = window.setTimeout(function(){_run_delayed(id);}, delay);
 			delayed_operation.timeout_id = timeout_id;
@@ -1742,7 +1626,7 @@
 			
 			//----------------------------------------------------------
 			
-			this.contains = function (value) //Not used
+			this.contains = function (value)
 			{
 				for (var key in dic)
 				{
@@ -1759,14 +1643,12 @@
 				if (key in dic)
 				{
 					return true;
-				}
-				else
-				{
+				} else {
 					return false;
 				}
 			};
 			
-			this.containsWhere = function (predicate) //Not used
+			this.containsWhere = function (predicate)
 			{
 				for (var key in dic)
 				{
@@ -1803,9 +1685,7 @@
 				if (key in dic)
 				{
 					return dic[key];
-				}
-				else
-				{
+				} else {
 					return undefined;
 				}
 			};
@@ -1823,14 +1703,12 @@
 					delete dic[key];
 					length--;
 					return result;
-				}
-				else
-				{
+				} else {
 					return undefined;
 				}
 			};
 			
-			this.removeWhere = function (predicate) //Not Used
+			this.removeWhere = function (predicate)
 			{
 				var result = 0;
 				for (var key in dic)
@@ -1863,9 +1741,7 @@
 					if (first)
 					{
 						first = false;
-					}
-					else
-					{
+					} else {
 						result += ',';
 					}
 					result += key;
@@ -1905,9 +1781,7 @@
 							var continuation = _event.continuations.shift();
 							continuation();
 							thoth.delay(callin, 0, false);
-						}
-						else
-						{
+						} else {
 							_event.executing = false;
 							events.remove(_event.id);
 						}
@@ -1922,9 +1796,7 @@
 				if (typeof event === 'undefined' || event === null)
 				{
 					return false;
-				}
-				else
-				{
+				} else {
 					event.continuations.push(continuation);
 					return true;
 				}
@@ -1941,8 +1813,7 @@
 						{
 							id : id,
 							continuations : [continuation],
-							executing : false
-						}
+							executing : false }
 					);
 				}
 				return true;
@@ -1959,9 +1830,7 @@
 				if (typeof event === 'undefined')
 				{
 					return false;
-				}
-				else
-				{
+				} else {
 					_execute_event(event);
 					return true;
 				}
@@ -1978,9 +1847,7 @@
 				if (typeof event === 'undefined' || event === null)
 				{
 					return false;
-				}
-				else
-				{
+				} else {
 					event.executing = false;
 					events.remove(event.id);
 					return true;
@@ -2027,9 +1894,7 @@
 			if (typeof absolute !== 'string')
 			{
 				return [];
-			}
-			else
-			{
+			} else {
 				if (absolute.endsWith(SEPARATOR))
 				{
 					absolute = absolute.substr(0, absolute.length - SEPARATOR.length);
@@ -2044,9 +1909,7 @@
 			if (typeof relative !== 'string')
 			{
 				return ['.'];
-			}
-			else
-			{
+			} else {
 				if (relative.startsWith(SEPARATOR))
 				{
 					relative = relative.substr(SEPARATOR.length);
@@ -2054,9 +1917,7 @@
 				if (relative === '')
 				{
 					return ['.'];
-				}
-				else
-				{
+				} else {
 					var folders = relative.split(SEPARATOR);
 					return _process_url(folders);
 				}
@@ -2068,11 +1929,9 @@
 			var check = url.indexOf('/');
 			if (check !== -1 && check === url.indexOf('//'))
 			{
-				//take as absolute or protocol relative
+				// take as absolute or protocol relative //
 				callback(url);
-			}
-			else
-			{
+			} else {
 				var index = 0;
 				var step = function()
 				{
@@ -2083,9 +1942,7 @@
 						if (included_urls.contains(_url))
 						{
 							callback(_url);
-						}
-						else
-						{
+						} else {
 							thoth.url_exists (
 								_url,
 								function (exists)
@@ -2093,9 +1950,7 @@
 									if (exists)
 									{
 										callback(_url);
-									}
-									else
-									{
+									} else {
 										thoth.delay(step, 0, false);
 									}
 								}
@@ -2142,19 +1997,13 @@
 								if (loading.containsKey(resolved_url))
 								{
 									loading.add(resolved_url, callback);
-								}
-								else
-								{
+								} else {
 									callback();
 								}
-							}
-							else
-							{
+							} else {
 								insert = true;
 							}
-						}
-						else
-						{
+						} else {
 							insert = true;
 							included_urls.push(resolved_url);
 						}
@@ -2188,9 +2037,7 @@
 					{
 						var _url = url.shift();
 						_include(_url, function(){thoth.delay(go, 0, false);}, false);
-					}
-					else
-					{
+					} else {
 						callback();
 					}
 				};
@@ -2217,14 +2064,10 @@
 						if (!included_urls.contains(_url))
 						{
 							_include(_url, function(){thoth.delay(go, 0, false);}, true);
-						}
-						else
-						{
+						} else {
 							thoth.delay(go, 0, false);
 						}
-					}
-					else
-					{
+					} else {
 						callback();
 					}
 				};
