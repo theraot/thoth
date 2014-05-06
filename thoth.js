@@ -1094,20 +1094,39 @@
 							var data = customValidation[validationIndex].match(/^([^\(]+)(?:\(([^\)]*)\))?$/);
 							if (data[1] in thoth.customValidations)
 							{
-								if ((data[2].startsWith('"') && data[2].endssWith('"')) || (data[2].startsWith('\'') && data[2].endssWith('\'')))
+								if (typeof data[2] !== 'undefined')
 								{
-									data[2] = data[2].substr(1, data[2].length - 1);
-								}
-								else if (data[2].startsWith('&'))
-								{
-									var fields = thoth.findFieldsByName(data[2]);
-									if (fields.length > 0)
+									if ((data[2].charAt(0) === '"' && data[2].endssWith('"')) || (data[2].charAt(0) === '\'' && data[2].endssWith('\'')))
 									{
-										data[2] = thoth.getValue(fields[0]);
+										data[2] = data[2].substr(1, data[2].length - 1);
 									}
 									else
 									{
-										data[2] = undefined;
+										var fields = null;
+										var _param = data[2].substr(1);
+										if (data[2].charAt(0) === '&')
+										{
+											fields = thoth.findFieldsByName(form, _param);
+										}
+										else if (data[2].charAt(0) === '@')
+										{
+											field = form.querySelector(_param);
+										}
+										else if (data[2].charAt(0) === '$')
+										{
+											data[2] = field.getAttribute(_param);
+										}
+										if (fields !== null)
+										{
+											if (fields.length > 0)
+											{
+												data[2] = thoth.getValue(fields[0]);
+											}
+											else
+											{
+												data[2] = undefined;
+											}
+										}
 									}
 								}
 								if (!thoth.customValidations[data[1]](value, data[2]))
