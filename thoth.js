@@ -282,6 +282,30 @@
 					}
 				}
 			};
+
+			thoth.invokeEx = function(callbacks, decisionCallback /*, thisArg, args...*/)
+			{
+				var thisArg = arguments.length >= 3 ? arguments[2] : void 0;
+				var args = Array.prototype.slice.call(arguments, 3, arguments.length);
+				if (typeof callbacks === 'function')
+				{
+					decisionCallback.call(thisArg, callbacks.apply(thisArg, args), -1);
+				}
+				else
+				{
+					var count = callbacks.length >>> 0;
+					for (var index = 0; index < count; index++)
+					{
+						if (index in callbacks)
+						{
+							if (false === decisionCallback.call(thisArg, callbacks[index].apply(thisArg, args), index))
+							{
+								break;
+							}
+						}
+					}
+				}
+			};
 		}
 	}
 )(window.thoth = (window.thoth || {}), window);
@@ -652,7 +676,7 @@
 		{
 			if (typeof handler === 'function')
 			{
-				if (typeof events === 'object' && events instanceof Array)
+				if (Array.isArray(events))
 				{
 					var result = [];
 					var index = 0;
@@ -1380,7 +1404,23 @@
 			};
 			var submitHandler = function(event) {
 				event.errors = _this.validateForm();
-				thoth.invoke(_this.callbacks, _this, event);
+				var go = true;
+				if ('stopImmediatePropagation' in event)
+				{
+					event.stopImmediatePropagation = function()
+					{
+						go = false;
+						event.stopImmediatePropagation();
+					};
+				}
+				else
+				{
+					event.stopImmediatePropagation = function()
+					{
+						go = false;
+					};
+				}
+				thoth.invokeEx(_this.callbacks, function() { return go; }, _this, event);
 				if (!Array.isArray(event.errors) || event.errors.length === 0)
 				{
 					return true;
@@ -1519,8 +1559,25 @@
 		{
 			if (eventName in _events)
 			{
-				thoth.invoke(_events[eventName], thoth, event);
+				var go = true;
+				if ('stopImmediatePropagation' in event)
+				{
+					event.stopImmediatePropagation = function()
+					{
+						go = false;
+						event.stopImmediatePropagation();
+					};
+				}
+				else
+				{
+					event.stopImmediatePropagation = function()
+					{
+						go = false;
+					};
+				}
+				thoth.invokeEx(_events[eventName], function() { return go; }, thoth, event);
 			}
+			return event.returnValue;
 		};
 	}
 )(window.thoth = (window.thoth || {}), window);
