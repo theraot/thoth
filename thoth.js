@@ -914,7 +914,7 @@
 							value = field.validation.sanitation(value);
 						}
 					}
-					var name = field.getAttribute('name');
+					var name = field.name;
 					if (type === 'radio')
 					{
 						if (name === null)
@@ -1106,7 +1106,7 @@
 				return thoth.VALIDATION_INVALID_ELEMENT;
 			}
 		}
-				thoth.customValidations = {
+		thoth.customValidations = {
 			'single-line': function(val) { return val.match(/\r|\n/) === null; },
 			'numeric': function(val) { return val.match(/^-?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?$/) !== null; },
 			'integer': function(val) { return val.match(/^-?[0-9]+$/) !== null; },
@@ -1356,7 +1356,7 @@
 			}
 			return result;
 		};
-				thoth.clearForm = function (form)
+		thoth.clearForm = function (form)
 		{
 			var elements = form.elements;
 			for (var index = 0; index < elements.length; index++)
