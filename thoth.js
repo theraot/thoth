@@ -1272,12 +1272,13 @@
 		};
 		thoth.FormValidator = function (form)
 		{
+			form = thoth.findFormByName(form);
 			var revision = 0;
 			var _this = this;
 			this.validatedHandlers = [];
 			this.submitHandlers = [];
 			this.fields = [];
-			this.form = thoth.findFormByName(form);
+			this.form = form;
 			this.validClass = '';
 			this.invalidClass = '';
 			this.getRevision = function ()
