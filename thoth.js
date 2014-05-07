@@ -873,7 +873,7 @@
 					field.validation.result = result;
 				}
 				var type = thoth.getType(field);
-				if (type === 'hidden' || type === 'image' || type === 'submit' || type === 'reset' || type === 'button')
+				if (type === 'hidden' || type === 'image' || type === 'submit' || type === 'reset' || type === 'button' || type === 'keygen' || thoth.hasAttribute(field, 'readonly') || thoth.hasAttribute(field, 'disabled'))
 				{
 					// Not validable //
 					return result.value = thoth.VALIDATION_NOT_VALIDABLE;
