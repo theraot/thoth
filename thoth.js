@@ -671,7 +671,7 @@
 		{
 			if (typeof callback === 'function')
 			{
-				if (window.document.readyState === 'loaded' || window.document.readyState === 'interactive' || window.document.readyState === 'complete')
+				if (window.document.readyState === 'loaded' || window.document.readyState === 'complete')
 				{
 					callback();
 				} else {
@@ -683,7 +683,7 @@
 							'onreadystatechange',
 							function()
 							{
-								if (window.document.readyState === 'loaded' || window.document.readyState === 'interactive' || window.document.readyState === 'complete')
+								if (window.document.readyState === 'loaded' || window.document.readyState === 'complete')
 								{
 									if (callback !== null)
 									{
@@ -873,7 +873,7 @@
 					field.validation.result = result;
 				}
 				var type = thoth.getType(field);
-				if (type === 'hidden' || type === 'image' || type === 'submit' || type === 'reset' || type === 'button' || type === 'keygen' || thoth.hasAttribute(field, 'readonly') || thoth.hasAttribute(field, 'disabled'))
+				if (!field.willValidate)
 				{
 					// Not validable //
 					return result.value = thoth.VALIDATION_NOT_VALIDABLE;
@@ -1273,22 +1273,50 @@
 		thoth.FormValidator = function (form)
 		{
 			form = thoth.findFormByName(form);
+			this.form = form;
+			if ('validator' in form)
+			{
+				throw new TypeError();
+			}
+			if (this.form === null)
+			{
+				throw new TypeError();
+			}
+			form.validator = this;
 			var revision = 0;
 			var _this = this;
 			this.validatedHandlers = [];
 			this.submitHandlers = [];
 			this.fields = [];
-			this.form = form;
-			this.validClass = '';
-			this.invalidClass = '';
+			this.validClass = form.getAttribute('data-valid-class');
+			this.invalidClass = form.getAttribute('data-invalid-class');
+			this.validatingClass = form.getAttribute('data-validating-class');
+			this.enabled = !thoth.hasAttribute(form, 'novalidate');
+			form.setAttribute('novalidate', 'novalidate');
+			var validateField = function(field)
+			{
+				if (!('validation' in field) || field.validation.revision != revision)
+				{
+					_validateField(field, _this);
+				}
+				var result = field.validation.result.value;
+				thoth.removeClass(field, _this.validatingClass);
+				if (result > 0)
+				{
+					thoth.addClass(field, _this.invalidClass);
+					thoth.removeClass(field, _this.validClass);
+				}
+				else if (result === 0)
+				{
+					thoth.addClass(field, _this.validClass);
+					thoth.removeClass(field, _this.invalidClass);
+				}
+				return result;
+			};
 			this.getRevision = function ()
 			{
 				return revision;
 			};
-			if (this.form === null)
-			{
-				throw new TypeError();
-			}
 			this.addSanitation = function(type, sanitation)
 			{
 				var elements = form.elements;
@@ -1322,21 +1350,10 @@
 				var index = elements.length;
 				while (index--)
 				{
-					if (!('validation' in elements[index]) || elements[index].validation.revision != revision)
-					{
-						_validateField(elements[index], _this);
-					}
-					var result = elements[index].validation.result.value;
+					var result = validateField(elements[index]);
 					if (result > 0)
 					{
-						thoth.addClass(elements[index], this.invalidClass);
-						thoth.removeClass(elements[index], this.validClass);
 						errors.unshift({element: elements[index], result: result});
-					}
-					else if (result === 0)
-					{
-						thoth.addClass(elements[index], this.validClass);
-						thoth.removeClass(elements[index], this.invalidClass);
 					}
 				}
 				return errors;
@@ -1345,23 +1362,82 @@
 			{
 				event = event || {};
 				_triggerEvent(_this.submitHandlers, event);
-				event.errors = _this.validateForm();
-				_triggerEvent(_this.validatedHandlers, event);
-				if (!Array.isArray(event.errors) || event.errors.length === 0)
+				if (_this.enabled)
 				{
-					return true;
-				} else {
-					if ('preventDefault' in event)
+					var index = form.elements.length;
+					while (index--)
 					{
-						event.preventDefault();
-						return undefined;
-					} else {
-						event.returnValue = false;
-						return false;
+						thoth.removeClass(form.elements[index], _this.invalidClass);
+						thoth.removeClass(form.elements[index], _this.validatingClass);
+						if (form.elements[index].willValidate)
+						{
+							thoth.addClass(form.elements[index], _this.validClass);
+						} else {
+							thoth.removeClass(form.elements[index], _this.validClass);
+						}
+					}
+					event.errors = _this.validateForm();
+					_triggerEvent(_this.validatedHandlers, event);
+					index = event.errors.length;
+					while (index--)
+					{
+						thoth.addClass(event.errors[index].element, _this.invalidClass);
+						thoth.removeClass(event.errors[index].element, _this.validClass);
+					}
+					if (Array.isArray(event.errors) && event.errors.length > 0)
+					{
+						if ('preventDefault' in event)
+						{
+							event.preventDefault();
+							return undefined;
+						} else {
+							event.returnValue = false;
+							return false;
+						}
 					}
 				}
+				return true;
 			};
-			thoth.on(form, 'submit', submitHandler);
+			thoth.on (form, 'submit', submitHandler);
+			var _index = form.elements.length;
+			while (_index--)
+			{
+				var preValidation = function()
+				{
+					thoth.removeClass(this, _this.invalidClass);
+					thoth.removeClass(this, _this.validClass);
+					if (this.willValidate)
+					{
+						thoth.addClass(this, _this.validatingClass);
+					}
+				};
+				var validate = function()
+				{
+					if (this.willValidate)
+					{
+						revision++;
+						validateField(this);
+					}
+				};
+				if (!('willValidate' in form.elements[_index]))
+				{
+					Object.defineProperty (
+						form.elements[_index],
+						'willValidate',
+						{
+							get: function()
+							{
+								var type = thoth.getType(this);
+								return (type !== 'hidden' && type !== 'image' && type !== 'submit' && type !== 'reset' && type !== 'button' && type !== 'keygen' && !thoth.hasAttribute(this, 'readonly') && !thoth.hasAttribute(this, 'disabled'));
+							}
+						}
+					);
+				}
+				var trigger = form.elements[_index].getAttribute('data-validation-trigger') || 'blur';
+				trigger = trigger.split(/\s/);
+				thoth.on (form.elements[_index], ['reset', 'change', 'input', 'keyup'], preValidation);
+				thoth.on (form.elements[_index], trigger, validate);
+			}
 			this.addEventListener = function(eventName, handler)
 			{
 				if (eventName === 'submit')
