@@ -1787,6 +1787,14 @@
 				}
 			};
 			
+			this.forEachPair = function(callback)
+			{
+				for (var key in dic)
+				{
+					callback({'key': key, 'value': dic[key]});
+				}
+			};
+			
 			this.get = function (key)
 			{
 				if (key in dic)
