@@ -895,6 +895,7 @@
 						if ('sanitation' in field.validation)
 						{
 							value = field.validation.sanitation(value);
+							thoth.setValue(field, value);
 						}
 					}
 					var name = field.name;
