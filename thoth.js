@@ -1326,7 +1326,7 @@
 				{
 					if (thoth.getType(elements[index]) === type)
 					{
-						elements[index].validation = elements[index].validation | {};
+						elements[index].validation = elements[index].validation || {};
 						elements[index].validation.sanitation = sanitation;
 					}
 				}
