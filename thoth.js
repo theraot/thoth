@@ -1102,7 +1102,7 @@
 								}
 								if (!thoth.customValidations[data[1]](value, data[2]))
 								{
-									return result.value = thoth.VALIDATION_CUSTOM_FAILURE;
+									return result.value = result.value = thoth.VALIDATION_CUSTOM_FAILURE;
 								}
 							}
 						}
