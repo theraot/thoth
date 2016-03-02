@@ -1151,7 +1151,7 @@
 							var userinfo = '(?:' + username + '(?:@' + password + ')?@)?';
 							var port = '(?:\\:[0-9]*)?';
 							var path = '(?:/' + url_unit_s + '+(?:/' + url_unit_s + '+)*)?'; // not allowing empty path segments //
-							var query = '(?:\\\?(?:' + url_unit + '*))?';
+							var query = '(?:\\\\?(?:' + url_unit + '*))?';
 							var regex = '^' + schema + '\\://' + userinfo + '([^:/]+)' + port + path + query +'$';
 							var matches = val.match(regex);
 							if (matches === null)
