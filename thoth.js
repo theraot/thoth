@@ -1141,10 +1141,11 @@
 			'tel': thoth.customValidations['single-line'],
 			'url': function(val)
 						{
-							var url_unit = '(?:[a-zA-Z0-9\\$\\(\\)\\*\\+\\-\\.\\?!&\',/:;=@_~]|%[a-fA-F0-9]{2})';
-							var url_unit_q = '(?:[a-zA-Z0-9\\$\\(\\)\\*\\+\\-\\.!&\',;=_~]|%[a-fA-F0-9]{2})';
-							var url_unit_r = '(?:[a-zA-Z0-9\\$\\(\\)\\*\\+\\-\\.\\?!&\',;=_~]|%[a-fA-F0-9]{2})';
-							var url_unit_s = '(?:[a-zA-Z0-9\\$\\(\\)\\*\\+\\-\\.!&\',:;=@_~]|%[a-fA-F0-9]{2})';
+							var unicode = '\u00a0-\ud7ff\ue000-\ufdcf\ufdf0-\ufffd\u10000-\u1fffd\u20000-\u2fffd\u30000-\u3fffd\u40000-\u4fffd\u50000-\u5fffd\u60000-\u6fffd\u70000-\u7fffd\u80000-\u8fffd\u90000-\u9fffd\ua0000-\uafffd\ub0000-\ubfffd\uc0000-\ucfffd\ud0000-\udfffd\ue0000-\uefffd\uf0000-\uffffd\u100000-\u10fffd';
+							var url_unit = '(?:[a-zA-Z0-9\\$\\(\\)\\*\\+\\-\\.\\?!&\',/:;=@_~' + unicode + ']|%[a-fA-F0-9]{2})';
+							var url_unit_q = '(?:[a-zA-Z0-9\\$\\(\\)\\*\\+\\-\\.!&\',;=_~' + unicode + ']|%[a-fA-F0-9]{2})';
+							var url_unit_r = '(?:[a-zA-Z0-9\\$\\(\\)\\*\\+\\-\\.\\?!&\',;=_~'  + unicode + ']|%[a-fA-F0-9]{2})';
+							var url_unit_s = '(?:[a-zA-Z0-9\\$\\(\\)\\*\\+\\-\\.!&\',:;=@_~'  + unicode + ']|%[a-fA-F0-9]{2})';
 							var schema = '(?:[a-zA-Z][a-zA-Z0-9+-.]*)';
 							var username = '(?:' + url_unit_q + '*(?:\\:(?:' + url_unit_q + '*))?)';
 							var password = '(?:' + url_unit_r + '*(?:\\:(?:' + url_unit_r + '*))?)';
@@ -1152,7 +1153,8 @@
 							var port = '(?:\\:[0-9]*)?';
 							var path = '(?:/' + url_unit_s + '+(?:/' + url_unit_s + '+)*)?'; // not allowing empty path segments //
 							var query = '(?:\\\\?(?:' + url_unit + '*))?';
-							var regex = '^' + schema + '\\://' + userinfo + '([^:/]+)' + port + path + query +'$';
+							var fragment = '(?:#(?:' + url_unit + '*))?';
+							var regex = '^' + schema + '\\://' + userinfo + '([^: /]+)' + port + path + query + fragment +'$';
 							var matches = val.match(regex);
 							if (matches === null)
 							{
