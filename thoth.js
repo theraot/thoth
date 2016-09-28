@@ -991,7 +991,7 @@
 									return result.value = result.value = thoth.VALIDATION_TYPE_MISMATCH;
 								}
 							}
-							if (types_literal.indexOf(type))
+							if (types_literal.indexOf(type) !== -1)
 							{
 								if (thoth.hasAttribute(field, 'pattern'))
 								{
