@@ -5,13 +5,13 @@
 			'upperCase' : function (value){return value.toUpperCase();}
 		};
 		
-		function showEnhancement(target, message, class, value)
+		function showEnhancement(target, message, clss, value)
 		{
 			if (message === '')
 			{
 				message = '{0}';
 			}
-			target.setAttribute('class', class);
+			target.setAttribute('class', clss);
 			target.innerHTML = string.format(message, '<span>' + value + '</span>')
 			target.style.display = '';
 		}
@@ -114,7 +114,7 @@
 			thoth.FormValidator = function(form)
 			{
 				form = thoth.findFormByName(form);
-				thoth.apply(form, 'textarea', enhaceTextarea);
+				thoth.apply(form, 'textarea', enhaceLengthCheck);
 				var result = new validator(form);
 				result.addSanitation('text', sanitations[form.getAttribute('sanitize')]);
 				result.validClass = 'valid';
