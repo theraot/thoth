@@ -1292,6 +1292,7 @@
 			form.validator = this;
 			var revision = 0;
 			var _this = this;
+			this.clearHandlers = [];
 			this.validatedHandlers = [];
 			this.submitHandlers = [];
 			this.fields = [];
@@ -1353,6 +1354,20 @@
 				}
 				return errors;
 			};
+			this.clearForm = function()
+			{
+				var elements = form.elements;
+				var index = elements.length;
+				while (index--)
+				{
+					thoth.clearValue(elements[index]);
+					elements[index].validation = elements[index].validation || {};
+					elements[index].validation.result = 0;
+					thoth.removeClass(elements[index], _this.invalidClass);
+					thoth.removeClass(elements[index], _this.validatingClass);
+				}
+				_triggerEvent(_this.clearHandlers, event);
+			}
 			var submitHandler = function(event)
 			{
 				event = event || {};
@@ -1443,6 +1458,10 @@
 				{
 					this.validatedHandlers.push(handler);
 				}
+				else if (eventName === 'clear')
+				{
+					this.clearHandlers.push(handler);
+				}
 			};
 			this.removeEventListener = function(eventName, handler)
 			{
@@ -1453,6 +1472,10 @@
 				else if (eventName === 'validated')
 				{
 					this.validatedHandlers.remove(handler);
+				}
+				else if (eventName === 'clear')
+				{
+					this.clearHandlers.remove(handler);
 				}
 			};
 		};
@@ -1510,11 +1533,18 @@
 		};
 		thoth.clearForm = function (form)
 		{
-			var elements = form.elements;
-			var index = elements.length;
-			while (index--)
+			if (typeof(form.validator) !== 'undefined')
 			{
-				thoth.clearValue(elements[index]);
+				form.validator.clearForm();
+			}
+			else
+			{
+				var elements = form.elements;
+				var index = elements.length;
+				while (index--)
+				{
+					thoth.clearValue(elements[index]);
+				}
 			}
 		};
 		thoth.saveForm = function (form)
