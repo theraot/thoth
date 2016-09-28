@@ -1427,6 +1427,15 @@
 					{
 						revision++;
 						validateField(this);
+						var result = validateField(this);
+						if (result > 0)
+						{
+							_triggerEvent(_this.validatedHandlers, {errors : [{element: this, result: result}]});
+						}
+						else
+						{
+							_triggerEvent(_this.validatedHandlers, {errors : []});
+						}
 					}
 				};
 				if (!('willValidate' in form.elements[_index]))
