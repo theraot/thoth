@@ -1337,18 +1337,6 @@
 					}
 				}
 			};
-			this.apply = function(type, callback)
-			{
-				var elements = form.elements;
-				var index = elements.length;
-				while (index--)
-				{
-					if (thoth.getType(elements[index]) === type)
-					{
-						callback(elements[index]);
-					}
-				}
-			};
 			this.validateForm = function()
 			{
 				var errors = [];
@@ -1467,6 +1455,28 @@
 					this.validatedHandlers.remove(handler);
 				}
 			};
+		};
+		thoth.apply = function(form, type, callback)
+		{
+			var elements = form.elements;
+			var index = elements.length;
+			if (type === null)
+			{
+				while (index--)
+				{
+					callback(elements[index]);
+				}
+			}
+			else
+			{
+				while (index--)
+				{
+					if (thoth.getType(elements[index]) === type)
+					{
+						callback(elements[index]);
+					}
+				}
+			}
 		};
 		thoth.findFieldsByType = function (form, type)
 		{
