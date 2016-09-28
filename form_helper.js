@@ -56,6 +56,10 @@
 		
 		function enhaceLengthCheck(element)
 		{
+			if (['textarea', 'text', 'email', 'search', 'password', 'tel', 'url'].indexOf(thoth.getType(element)) === -1)
+			{
+				return;
+			}
 			var hasmin = thoth.hasAttribute(element, 'minlength');
 			var hasmax = thoth.hasAttribute(element, 'maxlength');
 			if (
@@ -115,8 +119,7 @@
 			thoth.FormValidator = function(form)
 			{
 				form = thoth.findFormByName(form);
-				thoth.apply(form, 'textarea', enhaceLengthCheck);
-				thoth.apply(form, 'password', enhaceLengthCheck);
+				thoth.apply(form, null, enhaceLengthCheck);
 				var result = new validator(form);
 				result.addSanitation('text', sanitations[form.getAttribute('sanitize')]);
 				result.validClass = 'valid';
