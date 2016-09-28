@@ -1096,7 +1096,7 @@
 										}
 										else if (data[2].charAt(0) === '@')
 										{
-											field = form.querySelector(_param);
+											fields = [form.querySelector(_param)];
 										}
 										else if (data[2].charAt(0) === '$')
 										{
