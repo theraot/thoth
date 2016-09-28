@@ -103,6 +103,7 @@
 				if (typeof(current.validationElement) !== 'undefined')
 				{
 					var x = current.validationElement;
+					x.innerHTML = '';
 					x.style.display = 'none';
 				}
 			}
