@@ -1600,6 +1600,10 @@
 		var _events = {};
 		function _triggerEvent(handlers, event)
 		{
+			if (typeof event === 'undefined')
+			{
+				return;
+			}
 			var go = true;
 			if ('stopImmediatePropagation' in event)
 			{
