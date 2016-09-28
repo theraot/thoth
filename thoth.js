@@ -10,6 +10,10 @@
 			String.format = function(format)
 			{
 				var args = Array.prototype.slice.call(arguments, 1);
+				if (typeof(format) === 'undefined' || format === null)
+				{
+					return format;
+				}
 				return String.prototype.replace.call (
 					format,
 					/{(\d+)}/g,
