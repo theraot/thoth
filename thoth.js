@@ -717,7 +717,8 @@
 		thoth.VALIDATION_MISSING = 5;
 		thoth.VALIDATION_STEP_MISMATCH = 6;
 		thoth.VALIDATION_TOO_LONG = 7;
-		thoth.VALIDATION_CUSTOM_FAILURE = 8;
+		thoth.VALIDATION_TOO_SHORT = 8;
+		thoth.VALIDATION_CUSTOM_FAILURE = 256;
 		var months_31 = [1, 3, 5, 7, 8, 10, 12];
 		var years_53 = [
 			  4,   9,  15,  20,  26,  32,  37,  43,  48,
@@ -1007,6 +1008,14 @@
 									if (!window.isNaN(maxlength) && value.length > maxlength)
 									{
 										return result.value = thoth.VALIDATION_TOO_LONG;
+									}
+								}
+								if (thoth.hasAttribute(field, 'minlength'))
+								{
+									var minlength = parseInt(field.getAttribute('minlength'));
+									if (!window.isNaN(minlength) && value.length < minlength)
+									{
+										return result.value = thoth.VALIDATION_TOO_SHORT;
 									}
 								}
 							} else {
