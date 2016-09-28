@@ -211,6 +211,22 @@
 								x.style.display = '';
 							}
 						}
+						var oninvalid = thoth.getInheritableAttribute(form, 'data-on-invalid');
+						if (typeof oninvalid !== 'undefined')
+						{
+							(new Function(oninvalid))();
+						}
+					}
+					else
+					{
+						if (form.validator.validateForm().length === 0)
+						{
+							var onvalid = thoth.getInheritableAttribute(form, 'data-on-valid');
+							if (typeof onvalid !== 'undefined')
+							{
+								(new Function(onvalid))();
+							}
+						}
 					}
 				});
 				return result;
