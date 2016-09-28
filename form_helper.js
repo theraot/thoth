@@ -83,7 +83,7 @@
 					{
 						validate += ' ';
 					}
-					validate += 'min-length($data-maxlength)';
+					validate += 'min-length($data-minlength)';
 					var min_length = parseInt(element.getAttribute('minlength'));
 					element.setAttribute('data-minlength', min_length);
 					element.removeAttribute('minlength');
