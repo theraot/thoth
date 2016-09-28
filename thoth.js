@@ -896,7 +896,7 @@
 					var value = thoth.getValue(field);
 					if ('validation' in field)
 					{
-						if ('sanitation' in field.validation)
+						if ('sanitation' in field.validation && typeof field.validation.sanitation == 'function')
 						{
 							value = field.validation.sanitation(value);
 							thoth.setValue(field, value);
