@@ -1304,7 +1304,6 @@
 			this.clearHandlers = [];
 			this.validatedHandlers = [];
 			this.submitHandlers = [];
-			this.fields = [];
 			this.validClass = form.getAttribute('data-valid-class');
 			this.invalidClass = form.getAttribute('data-invalid-class');
 			this.validatingClass = form.getAttribute('data-validating-class');
