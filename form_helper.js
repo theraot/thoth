@@ -12,39 +12,39 @@
 				message = '{0}';
 			}
 			target.setAttribute('class', clss);
-			target.innerHTML = string.format(message, '<span>' + value + '</span>')
+			target.innerHTML = String.format(message, '<span>' + value + '</span>')
 			target.style.display = '';
 		}
 		
 		function updateCount(event)
 		{
-			var hasmin = thoth.hasAttribute(element, 'data-minlength');
-			var hasmax = thoth.hasAttribute(element, 'data-maxlength');
+			var hasmin = thoth.hasAttribute(this, 'data-minlength');
+			var hasmax = thoth.hasAttribute(this, 'data-maxlength');
 			var value_length = this.value.length;
 			if (hasmin)
 			{
-				var min_length = parseInt(element.getAttribute('data-minlength'));
+				var min_length = parseInt(this.getAttribute('data-minlength'));
 				if (value_length < min_length)
 				{
-					showEnhancement(this.enhanceElement, thoth.getInheritableAttribute(element, 'data-lacking'), thoth.getInheritableAttribute(element, 'data-lacking-class'), min_length - value_length);
+					showEnhancement(this.enhanceElement, thoth.getInheritableAttribute(this, 'data-lacking'), thoth.getInheritableAttribute(this, 'data-lacking-class'), min_length - value_length);
 					return;
 				}
 				else if (!hasmax)
 				{
-					target.setAttribute('class', '');
-					target.style.display = 'none';
+					this.enhanceElement.setAttribute('class', '');
+					this.enhanceElement.style.display = 'none';
 				}
 			}
 			if (hasmax)
 			{
-				var max_length = parseInt(element.getAttribute('data-maxlength'));
+				var max_length = parseInt(this.getAttribute('data-maxlength'));
 				if (value_length < max_length)
 				{
-					showEnhancement(this.enhanceElement, thoth.getInheritableAttribute(element, 'data-remaining'), thoth.getInheritableAttribute(element, 'data-remaining-class'), max_length - value_length);
+					showEnhancement(this.enhanceElement, thoth.getInheritableAttribute(this, 'data-remaining'), thoth.getInheritableAttribute(this, 'data-remaining-class'), max_length - value_length);
 				}
 				else
 				{
-					showEnhancement(this.enhanceElement, thoth.getInheritableAttribute(element, 'data-excess'), thoth.getInheritableAttribute(element, 'data-excess-class'), value_length - max_length);
+					showEnhancement(this.enhanceElement, thoth.getInheritableAttribute(this, 'data-excess'), thoth.getInheritableAttribute(this, 'data-excess-class'), value_length - max_length);
 				}
 			}
 			if (event !== undefined && 'preventDefault' in event)
@@ -115,6 +115,7 @@
 			{
 				form = thoth.findFormByName(form);
 				thoth.apply(form, 'textarea', enhaceLengthCheck);
+				thoth.apply(form, 'password', enhaceLengthCheck);
 				var result = new validator(form);
 				result.addSanitation('text', sanitations[form.getAttribute('sanitize')]);
 				result.validClass = 'valid';
